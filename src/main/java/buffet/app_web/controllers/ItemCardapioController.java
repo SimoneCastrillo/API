@@ -2,6 +2,7 @@ package buffet.app_web.controllers;
 
 import buffet.app_web.entities.ItemCardapio;
 import buffet.app_web.service.ItemCardapioService;
+import buffet.app_web.strategies.ItemCardapioStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,29 +13,29 @@ import java.util.Optional;
 @RequestMapping("/itens-cardapio")
 public class ItemCardapioController {
     @Autowired
-    private ItemCardapioService itemCardapioService;
+    private ItemCardapioStrategy itemCardapioStrategy;
 
     @GetMapping
     public List<ItemCardapio> listarTodos(){
-        return itemCardapioService.listarTodos();
+        return itemCardapioStrategy.listarTodos();
     }
 
     @GetMapping("/{id}")
     public ItemCardapio buscarPorId(@PathVariable int id){
-        Optional<ItemCardapio> itemOpt = itemCardapioService.buscarPorId(id);
+        Optional<ItemCardapio> itemOpt = itemCardapioStrategy.buscarPorId(id);
         return itemOpt.orElse(null);
     }
 
     @PostMapping
     public ItemCardapio criar(@RequestBody ItemCardapio item){
-        return itemCardapioService.salvar(item);
+        return itemCardapioStrategy.salvar(item);
     }
 
     @PutMapping("/{id}")
     public ItemCardapio atualizar(@PathVariable int id, @RequestBody ItemCardapio itemAtualizado){
-        if (itemCardapioService.buscarPorId(id).isPresent()){
+        if (itemCardapioStrategy.buscarPorId(id).isPresent()){
             itemAtualizado.setId(id);
-            return itemCardapioService.salvar(itemAtualizado);
+            return itemCardapioStrategy.salvar(itemAtualizado);
         }
 
         return null;
@@ -42,8 +43,8 @@ public class ItemCardapioController {
 
     @DeleteMapping("/{id}")
     public String deletar(@PathVariable int id){
-        if (itemCardapioService.buscarPorId(id).isPresent()){
-            itemCardapioService.deletar(id);
+        if (itemCardapioStrategy.buscarPorId(id).isPresent()){
+            itemCardapioStrategy.deletar(id);
 
             return "Item deletado com sucesso!";
         }
