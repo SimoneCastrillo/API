@@ -2,15 +2,15 @@ package buffet.app_web.service;
 
 import buffet.app_web.entities.ItemCardapio;
 import buffet.app_web.repositories.ItemCardapioRepository;
+import buffet.app_web.strategies.ItemCardapioStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ItemCardapioService {
+public class ItemCardapioService implements ItemCardapioStrategy {
     @Autowired
     private ItemCardapioRepository itemCardapioRepository;
 
@@ -29,4 +29,5 @@ public class ItemCardapioService {
     public void deletar(Integer id){
         itemCardapioRepository.deleteById(id);
     }
+
 }
