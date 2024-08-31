@@ -23,12 +23,13 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public Usuario buscarPorId(@PathVariable int id){
         Optional<Usuario> usuarioOpt = usuarioStrategy.buscarPorId(id);
+
         return usuarioOpt.orElse(null);
     }
 
     @PostMapping
     public Usuario criar(@RequestBody Usuario usuario){
-        return  usuarioStrategy.salvar(usuario);
+        return usuarioStrategy.salvar(usuario);
     }
 
     @PutMapping("/{id}")
