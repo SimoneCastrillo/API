@@ -4,6 +4,7 @@ import buffet.app_web.entities.ItemCardapio;
 import buffet.app_web.service.ItemCardapioService;
 import buffet.app_web.strategies.ItemCardapioStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,39 +17,50 @@ public class ItemCardapioController {
     private ItemCardapioStrategy itemCardapioStrategy;
 
     @GetMapping
-    public List<ItemCardapio> listarTodos(){
-        return itemCardapioStrategy.listarTodos();
+    public ResponseEntity<List<ItemCardapio>> listarTodos(){
+        if (itemCardapioStrategy.listarTodos().isEmpty()){
+            return ResponseEntity.status(204).build();
+        }
+
+        return ResponseEntity.status(200).body(itemCardapioStrategy.listarTodos());
     }
 
     @GetMapping("/{id}")
-    public ItemCardapio buscarPorId(@PathVariable int id){
+    public ResponseEntity<ItemCardapio> buscarPorId(@PathVariable int id){
         Optional<ItemCardapio> itemOpt = itemCardapioStrategy.buscarPorId(id);
-        return itemOpt.orElse(null);
+        if (itemOpt.isPresent()){
+            return ResponseEntity.status(200).body(itemOpt.get());
+        }
+
+        return ResponseEntity.status(404).build();
     }
 
     @PostMapping
-    public ItemCardapio criar(@RequestBody ItemCardapio item){
-        return itemCardapioStrategy.salvar(item);
+    public ResponseEntity<ItemCardapio> criar(@RequestBody ItemCardapio item){
+        item.setId(null);
+        return ResponseEntity.status(201).body(itemCardapioStrategy.salvar(item));
     }
 
     @PutMapping("/{id}")
-    public ItemCardapio atualizar(@PathVariable int id, @RequestBody ItemCardapio itemAtualizado){
+    public ResponseEntity<ItemCardapio> atualizar(@PathVariable int id, @RequestBody ItemCardapio itemAtualizado){
         if (itemCardapioStrategy.buscarPorId(id).isPresent()){
             itemAtualizado.setId(id);
-            return itemCardapioStrategy.salvar(itemAtualizado);
+            itemCardapioStrategy.salvar(itemAtualizado);
+
+            return ResponseEntity.status(200).body(itemAtualizado);
         }
 
-        return null;
+        return ResponseEntity.status(404).build();
     }
 
     @DeleteMapping("/{id}")
-    public String deletar(@PathVariable int id){
+    public ResponseEntity<Void> deletar(@PathVariable int id){
         if (itemCardapioStrategy.buscarPorId(id).isPresent()){
             itemCardapioStrategy.deletar(id);
 
-            return "Item deletado com sucesso!";
+            return ResponseEntity.status(204).build();
         }
 
-        return "Item não encontrado";
+        return ResponseEntity.status(404).build();
     }
 }

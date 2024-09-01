@@ -4,6 +4,7 @@ import buffet.app_web.entities.Usuario;
 import buffet.app_web.service.UsuarioService;
 import buffet.app_web.strategies.UsuarioStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,38 +17,51 @@ public class UsuarioController {
     private UsuarioStrategy usuarioStrategy;
 
     @GetMapping
-    public List<Usuario> listarTodos(){
-        return usuarioStrategy.listarTodos();
+    public ResponseEntity<List<Usuario>> listarTodos(){
+        if (usuarioStrategy.listarTodos().isEmpty()){
+            return ResponseEntity.status(204).build();
+        }
+
+        return ResponseEntity.status(200).body(usuarioStrategy.listarTodos());
     }
 
     @GetMapping("/{id}")
-    public Usuario buscarPorId(@PathVariable int id){
+    public ResponseEntity<Usuario> buscarPorId(@PathVariable int id){
         Optional<Usuario> usuarioOpt = usuarioStrategy.buscarPorId(id);
 
-        return usuarioOpt.orElse(null);
+        if (usuarioOpt.isPresent()){
+            return ResponseEntity.status(200).body(usuarioOpt.get());
+        }
+
+        return ResponseEntity.status(404).build();
     }
 
     @PostMapping
-    public Usuario criar(@RequestBody Usuario usuario){
-        return usuarioStrategy.salvar(usuario);
+    public ResponseEntity<Usuario> criar(@RequestBody Usuario usuario){
+        usuario.setId(null);
+        return ResponseEntity.status(201).body(usuarioStrategy.salvar(usuario));
     }
 
     @PutMapping("/{id}")
-    public Usuario atualizar(@PathVariable int id, @RequestBody Usuario usuarioAtualizado){
+    public ResponseEntity<Usuario> atualizar(@PathVariable int id, @RequestBody Usuario usuarioAtualizado){
         if(usuarioStrategy.buscarPorId(id).isPresent()){
             usuarioAtualizado.setId(id);
-            return usuarioStrategy.salvar(usuarioAtualizado);
+            usuarioStrategy.salvar(usuarioAtualizado);
+
+            return ResponseEntity.status(200).body(usuarioAtualizado);
         }
-        return null;
+
+        return ResponseEntity.status(404).build();
     }
 
     @DeleteMapping("/{id}")
-    public String deletar(@PathVariable int id){
+    public ResponseEntity<Void> deletar(@PathVariable int id){
         if(usuarioStrategy.buscarPorId(id).isPresent()){
             usuarioStrategy.deletar(id);
-            return  "Usuário deletado com sucesso!";
+
+            return ResponseEntity.status(204).build();
         }
-        return "Usuário não deletado";
+        return ResponseEntity.status(404).build();
     }
 
 }
