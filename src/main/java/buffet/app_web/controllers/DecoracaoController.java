@@ -57,6 +57,7 @@ public class DecoracaoController {
     public ResponseEntity<Void> deletar(@PathVariable int id){
         if (decoracaoStrategy.buscarPorId(id).isPresent()){
             decoracaoStrategy.deletar(id);
+
             return ResponseEntity.status(204).build();
         }
 
