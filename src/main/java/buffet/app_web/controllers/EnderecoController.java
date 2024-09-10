@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
 import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/enderecos")
@@ -71,6 +72,7 @@ public class EnderecoController {
         return ResponseEntity.ok(resposta);
     }
 
+
     public static void ordenarPorCep(Endereco[] vetor, int tamanhoAtual){
         for (int i = 1; i <= tamanhoAtual; i++) {
             Endereco x = vetor[i];
@@ -82,5 +84,10 @@ public class EnderecoController {
             }
             vetor[j + 1] = x;
         }
+    }
+
+    @GetMapping("/dados-ordenados")
+    public Endereco[] exibirDadosOrdenados(){
+        return enderecos;
     }
 }
