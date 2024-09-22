@@ -3,6 +3,7 @@ package buffet.app_web.controllers;
 import buffet.app_web.entities.Usuario;
 import buffet.app_web.service.UsuarioService;
 import buffet.app_web.strategies.UsuarioStrategy;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,13 +38,13 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<Usuario> criar(@RequestBody Usuario usuario){
+    public ResponseEntity<Usuario> criar(@RequestBody @Valid Usuario usuario){
         usuario.setId(null);
         return ResponseEntity.status(201).body(usuarioStrategy.salvar(usuario));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> atualizar(@PathVariable int id, @RequestBody Usuario usuarioAtualizado){
+    public ResponseEntity<Usuario> atualizar(@PathVariable int id, @RequestBody @Valid Usuario usuarioAtualizado){
         if(usuarioStrategy.buscarPorId(id).isPresent()){
             usuarioAtualizado.setId(id);
             usuarioStrategy.salvar(usuarioAtualizado);

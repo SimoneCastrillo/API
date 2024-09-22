@@ -2,6 +2,7 @@ package buffet.app_web.controllers;
 
 import buffet.app_web.entities.Orcamento;
 import buffet.app_web.strategies.OrcamentoStrategy;
+import jakarta.validation.Valid;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,13 +37,13 @@ public class OrcamentoController {
     }
 
     @PostMapping
-    public ResponseEntity<Orcamento> criar(@RequestBody Orcamento orcamento){
+    public ResponseEntity<Orcamento> criar(@RequestBody @Valid Orcamento orcamento){
         orcamento.setId(null);
         return ResponseEntity.status(201).body(orcamentoStrategy.salvar(orcamento));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Orcamento> atualizar(@RequestBody Orcamento orcamento, @PathVariable int id){
+    public ResponseEntity<Orcamento> atualizar(@RequestBody @Valid Orcamento orcamento, @PathVariable int id){
         if (orcamentoStrategy.buscarPorId(id).isPresent()){
             orcamento.setId(id);
             return ResponseEntity.status(200).body(orcamentoStrategy.salvar(orcamento));
