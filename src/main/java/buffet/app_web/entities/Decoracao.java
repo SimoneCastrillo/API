@@ -1,5 +1,6 @@
 package buffet.app_web.entities;
 
+import buffet.app_web.entities.enums.TipoEvento;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,7 +11,7 @@ public class Decoracao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String tipoEvento;
+    private TipoEvento tipoEvento;
     private String nome;
     private String foto;
 
@@ -22,11 +23,11 @@ public class Decoracao {
         this.id = id;
     }
 
-    public String getTipoEvento() {
+    public TipoEvento getTipoEvento() {
         return tipoEvento;
     }
 
-    public void setTipoEvento(String tipoEvento) {
+    public void setTipoEvento(TipoEvento tipoEvento) {
         this.tipoEvento = tipoEvento;
     }
 

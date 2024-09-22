@@ -3,6 +3,7 @@ package buffet.app_web.controllers;
 import buffet.app_web.entities.ItemCardapio;
 import buffet.app_web.service.ItemCardapioService;
 import buffet.app_web.strategies.ItemCardapioStrategy;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,13 +37,13 @@ public class ItemCardapioController {
     }
 
     @PostMapping
-    public ResponseEntity<ItemCardapio> criar(@RequestBody ItemCardapio item){
+    public ResponseEntity<ItemCardapio> criar(@RequestBody @Valid ItemCardapio item){
         item.setId(null);
         return ResponseEntity.status(201).body(itemCardapioStrategy.salvar(item));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ItemCardapio> atualizar(@PathVariable int id, @RequestBody ItemCardapio itemAtualizado){
+    public ResponseEntity<ItemCardapio> atualizar(@PathVariable int id, @RequestBody @Valid ItemCardapio itemAtualizado){
         if (itemCardapioStrategy.buscarPorId(id).isPresent()){
             itemAtualizado.setId(id);
             itemCardapioStrategy.salvar(itemAtualizado);

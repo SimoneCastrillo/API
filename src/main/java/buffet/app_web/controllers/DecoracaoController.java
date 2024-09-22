@@ -2,6 +2,7 @@ package buffet.app_web.controllers;
 
 import buffet.app_web.entities.Decoracao;
 import buffet.app_web.strategies.DecoracaoStrategy;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,13 +37,13 @@ public class DecoracaoController {
     }
 
     @PostMapping
-    public ResponseEntity<Decoracao> publicar(@RequestBody Decoracao decoracao){
+    public ResponseEntity<Decoracao> publicar(@RequestBody @Valid Decoracao decoracao){
         decoracao.setId(null);
         return ResponseEntity.status(201).body(decoracaoStrategy.salvar(decoracao));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Decoracao> atualizar(@RequestBody Decoracao decoracao, @PathVariable int id){
+    public ResponseEntity<Decoracao> atualizar(@RequestBody @Valid Decoracao decoracao, @PathVariable int id){
         if (decoracaoStrategy.buscarPorId(id).isPresent()){
             decoracao.setId(id);
             decoracaoStrategy.salvar(decoracao);
