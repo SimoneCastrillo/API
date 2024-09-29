@@ -1,6 +1,5 @@
 package buffet.app_web.entities;
 
-import buffet.app_web.entities.enums.TipoEvento;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Max;
@@ -26,16 +25,13 @@ public class Orcamento {
     private LocalTime inicio;
     private LocalTime fim;
     private String sugestao;
+
+    @ManyToOne
     private TipoEvento tipoEvento;
 
     @ManyToOne
     private Usuario usuario;
 
-    @OneToOne
+    @ManyToOne
     private Decoracao decoracao;
-
-    @OneToOne
-    private Cardapio cardapio;
-
-
 }
