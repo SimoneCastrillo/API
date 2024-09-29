@@ -1,8 +1,7 @@
 package buffet.app_web.controllers;
 
-import buffet.app_web.entities.ItemCardapio;
-import buffet.app_web.service.ItemCardapioService;
-import buffet.app_web.strategies.ItemCardapioStrategy;
+import buffet.app_web.entities.TipoEvento;
+import buffet.app_web.strategies.TipoEventoStrategy;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,13 +11,13 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/itens-cardapio")
-public class ItemCardapioController {
+@RequestMapping("/tipos-evento")
+public class TipoEventoController {
     @Autowired
-    private ItemCardapioStrategy itemCardapioStrategy;
+    private TipoEventoStrategy itemCardapioStrategy;
 
     @GetMapping
-    public ResponseEntity<List<ItemCardapio>> listarTodos(){
+    public ResponseEntity<List<TipoEvento>> listarTodos(){
         if (itemCardapioStrategy.listarTodos().isEmpty()){
             return ResponseEntity.status(204).build();
         }
@@ -27,8 +26,8 @@ public class ItemCardapioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItemCardapio> buscarPorId(@PathVariable int id){
-        Optional<ItemCardapio> itemOpt = itemCardapioStrategy.buscarPorId(id);
+    public ResponseEntity<TipoEvento> buscarPorId(@PathVariable int id){
+        Optional<TipoEvento> itemOpt = itemCardapioStrategy.buscarPorId(id);
         if (itemOpt.isPresent()){
             return ResponseEntity.status(200).body(itemOpt.get());
         }
@@ -37,13 +36,13 @@ public class ItemCardapioController {
     }
 
     @PostMapping
-    public ResponseEntity<ItemCardapio> criar(@RequestBody @Valid ItemCardapio item){
+    public ResponseEntity<TipoEvento> criar(@RequestBody @Valid TipoEvento item){
         item.setId(null);
         return ResponseEntity.status(201).body(itemCardapioStrategy.salvar(item));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ItemCardapio> atualizar(@PathVariable int id, @RequestBody @Valid ItemCardapio itemAtualizado){
+    public ResponseEntity<TipoEvento> atualizar(@PathVariable int id, @RequestBody @Valid TipoEvento itemAtualizado){
         if (itemCardapioStrategy.buscarPorId(id).isPresent()){
             itemAtualizado.setId(id);
             itemCardapioStrategy.salvar(itemAtualizado);
