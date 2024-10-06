@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface TipoEventoStrategy {
     List<TipoEvento> listarTodos();
-    Optional<TipoEvento> buscarPorId(Integer id);
-    TipoEvento salvar(TipoEvento item);
+    TipoEvento buscarPorId(Integer id);
+    TipoEvento salvar(TipoEvento tipoEvento);
     void deletar(Integer id);
 }

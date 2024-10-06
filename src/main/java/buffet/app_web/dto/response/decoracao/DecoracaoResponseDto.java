@@ -1,4 +1,4 @@
-package buffet.app_web.dto.response;
+package buffet.app_web.dto.response.decoracao;
 
 import buffet.app_web.entities.TipoEvento;
 import lombok.Builder;

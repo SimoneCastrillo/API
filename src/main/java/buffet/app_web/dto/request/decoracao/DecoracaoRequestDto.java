@@ -1,4 +1,4 @@
-package buffet.app_web.dto.request;
+package buffet.app_web.dto.request.decoracao;
 
 import buffet.app_web.entities.TipoEvento;
 import jakarta.validation.constraints.NotBlank;

@@ -3,8 +3,12 @@ package buffet.app_web.service;
 import buffet.app_web.entities.Orcamento;
 import buffet.app_web.repositories.OrcamentoRepository;
 import buffet.app_web.strategies.OrcamentoStrategy;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +24,8 @@ public class OrcamentoService implements OrcamentoStrategy {
     }
 
     @Override
-    public Optional<Orcamento> buscarPorId(Integer id) {
-        return orcamentoRepository.findById(id);
+    public Orcamento buscarPorId(Integer id) {
+        return orcamentoRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
@@ -31,6 +35,21 @@ public class OrcamentoService implements OrcamentoStrategy {
 
     @Override
     public void deletar(Integer id) {
-        orcamentoRepository.deleteById(id);
+        Orcamento orcamento = buscarPorId(id);
+        orcamentoRepository.deleteById(orcamento.getId());
+    }
+
+    @Override
+    public Orcamento cancelarEvento(int id) {
+        Orcamento orcamento = buscarPorId(id);
+
+        if (orcamento.getCancelado() || orcamento.getStatus().equals("FINALIZADO")){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        orcamento.setId(id);
+        orcamento.setCancelado(true);
+        orcamento.setStatus(orcamento.getStatus());
+        return orcamentoRepository.save(orcamento);
     }
 }
