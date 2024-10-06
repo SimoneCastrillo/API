@@ -3,6 +3,7 @@ package buffet.app_web.controllers;
 import buffet.app_web.dto.request.decoracao.DecoracaoRequestDto;
 import buffet.app_web.dto.response.decoracao.DecoracaoResponseDto;
 import buffet.app_web.entities.Decoracao;
+import buffet.app_web.entities.TipoEvento;
 import buffet.app_web.mapper.DecoracaoMapper;
 import buffet.app_web.strategies.DecoracaoStrategy;
 import jakarta.validation.Valid;
@@ -60,6 +61,17 @@ public class DecoracaoController {
 
         decoracaoStrategy.deletar(id);
         return noContent().build();
+    }
+
+    @GetMapping("/tipo-de-evento")
+    public ResponseEntity<List<DecoracaoResponseDto>> listarTodos(@RequestParam String nome){
+        if (decoracaoStrategy.listarPorTipoDeEvento(nome).isEmpty()){
+            return noContent().build();
+        }
+
+        List<DecoracaoResponseDto> listaDto =
+                decoracaoStrategy.listarPorTipoDeEvento(nome).stream().map(DecoracaoMapper::toResponseDto).toList();
+        return ok(listaDto);
     }
 
 }
