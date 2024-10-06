@@ -1,6 +1,9 @@
 package buffet.app_web.controllers;
 
+import buffet.app_web.dto.request.decoracao.DecoracaoRequestDto;
+import buffet.app_web.dto.response.decoracao.DecoracaoResponseDto;
 import buffet.app_web.entities.Decoracao;
+import buffet.app_web.mapper.DecoracaoMapper;
 import buffet.app_web.strategies.DecoracaoStrategy;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+
+import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @RequestMapping("/decoracoes")
@@ -17,52 +21,45 @@ public class DecoracaoController {
     private DecoracaoStrategy decoracaoStrategy;
 
     @GetMapping
-    public ResponseEntity<List<Decoracao>> listarTodos(){
+    public ResponseEntity<List<DecoracaoResponseDto>> listarTodos(){
         if (decoracaoStrategy.listarTodos().isEmpty()){
-            return ResponseEntity.status(204).build();
+            return noContent().build();
         }
 
-        return ResponseEntity.status(200).body(decoracaoStrategy.listarTodos());
+        List<DecoracaoResponseDto> listaDto =
+                decoracaoStrategy.listarTodos().stream().map(DecoracaoMapper::toResponseDto).toList();
+        return ok(listaDto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Decoracao> buscarPorId(@PathVariable int id){
-        Optional<Decoracao> decoracaoOptional = decoracaoStrategy.buscarPorId(id);
-
-        if (decoracaoOptional.isPresent()){
-            return ResponseEntity.status(200).body(decoracaoOptional.get());
-        }
-
-        return ResponseEntity.status(404).build();
+    public ResponseEntity<DecoracaoResponseDto> buscarPorId(@PathVariable int id){
+        return ok(DecoracaoMapper.toResponseDto(decoracaoStrategy.buscarPorId(id)));
     }
 
     @PostMapping
-    public ResponseEntity<Decoracao> publicar(@RequestBody @Valid Decoracao decoracao){
-        decoracao.setId(null);
-        return ResponseEntity.status(201).body(decoracaoStrategy.salvar(decoracao));
+    public ResponseEntity<DecoracaoResponseDto> publicar(@RequestBody @Valid DecoracaoRequestDto decoracaoRequestDto){
+        Decoracao decoracao = decoracaoStrategy.salvar(DecoracaoMapper.toEntity(decoracaoRequestDto));
+        DecoracaoResponseDto decoracaoResponseDto = DecoracaoMapper.toResponseDto(decoracao);
+        return ok(decoracaoResponseDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Decoracao> atualizar(@RequestBody @Valid Decoracao decoracao, @PathVariable int id){
-        if (decoracaoStrategy.buscarPorId(id).isPresent()){
-            decoracao.setId(id);
-            decoracaoStrategy.salvar(decoracao);
+    public ResponseEntity<DecoracaoResponseDto> atualizar(@RequestBody @Valid DecoracaoRequestDto decoracaoRequestDto, @PathVariable int id){
+        decoracaoStrategy.buscarPorId(id);
 
-            return ResponseEntity.status(200).body(decoracao);
-        }
+        Decoracao decoracao = DecoracaoMapper.toEntity(decoracaoRequestDto);
+        decoracao.setId(id);
+        Decoracao decoracaoSalva = decoracaoStrategy.salvar(decoracao);
 
-        return ResponseEntity.status(404).build();
+        return ok(DecoracaoMapper.toResponseDto(decoracaoSalva));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable int id){
-        if (decoracaoStrategy.buscarPorId(id).isPresent()){
-            decoracaoStrategy.deletar(id);
+        decoracaoStrategy.buscarPorId(id);
 
-            return ResponseEntity.status(204).build();
-        }
-
-        return ResponseEntity.status(404).build();
+        decoracaoStrategy.deletar(id);
+        return noContent().build();
     }
 
 }

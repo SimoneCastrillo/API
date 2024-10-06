@@ -7,8 +7,8 @@ import java.util.Optional;
 
 public interface UsuarioStrategy {
     List<Usuario> listarTodos();
-    Optional<Usuario> buscarPorId(Integer id);
-    Usuario salvar(Usuario item);
+    Usuario buscarPorId(Integer id);
+    Usuario salvar(Usuario usuario);
     void deletar(Integer id);
 }
 

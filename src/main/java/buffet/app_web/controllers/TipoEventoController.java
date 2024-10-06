@@ -1,6 +1,9 @@
 package buffet.app_web.controllers;
 
+import buffet.app_web.dto.request.tipoevento.TipoEventoRequestDto;
+import buffet.app_web.dto.response.tipoevento.TipoEventoResponseDto;
 import buffet.app_web.entities.TipoEvento;
+import buffet.app_web.mapper.TipoEventoMapper;
 import buffet.app_web.strategies.TipoEventoStrategy;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,59 +11,58 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+
+import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @RequestMapping("/tipos-evento")
 public class TipoEventoController {
     @Autowired
-    private TipoEventoStrategy itemCardapioStrategy;
+    private TipoEventoStrategy tipoEventoStrategy;
 
     @GetMapping
-    public ResponseEntity<List<TipoEvento>> listarTodos(){
-        if (itemCardapioStrategy.listarTodos().isEmpty()){
-            return ResponseEntity.status(204).build();
+    public ResponseEntity<List<TipoEventoResponseDto>> listarTodos(){
+        if (tipoEventoStrategy.listarTodos().isEmpty()){
+            return noContent().build();
         }
 
-        return ResponseEntity.status(200).body(itemCardapioStrategy.listarTodos());
+        List<TipoEventoResponseDto> listDto =
+                tipoEventoStrategy.listarTodos().stream().map(TipoEventoMapper::toResponseDto).toList();
+
+        return ok(listDto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TipoEvento> buscarPorId(@PathVariable int id){
-        Optional<TipoEvento> itemOpt = itemCardapioStrategy.buscarPorId(id);
-        if (itemOpt.isPresent()){
-            return ResponseEntity.status(200).body(itemOpt.get());
-        }
-
-        return ResponseEntity.status(404).build();
+    public ResponseEntity<TipoEventoResponseDto> buscarPorId(@PathVariable int id){
+        TipoEventoResponseDto dto = TipoEventoMapper.toResponseDto(tipoEventoStrategy.buscarPorId(id));
+        return ok(dto);
     }
 
     @PostMapping
-    public ResponseEntity<TipoEvento> criar(@RequestBody @Valid TipoEvento item){
-        item.setId(null);
-        return ResponseEntity.status(201).body(itemCardapioStrategy.salvar(item));
+    public ResponseEntity<TipoEventoResponseDto> criar(@RequestBody @Valid TipoEventoRequestDto tipoEventoRequestDto){
+        TipoEvento tipoEventoSalvo = tipoEventoStrategy.salvar(TipoEventoMapper.toEntity(tipoEventoRequestDto));
+        TipoEventoResponseDto tipoEventoResponseDto = TipoEventoMapper.toResponseDto(tipoEventoSalvo);
+
+        return created(null).body(tipoEventoResponseDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TipoEvento> atualizar(@PathVariable int id, @RequestBody @Valid TipoEvento itemAtualizado){
-        if (itemCardapioStrategy.buscarPorId(id).isPresent()){
-            itemAtualizado.setId(id);
-            itemCardapioStrategy.salvar(itemAtualizado);
+    public ResponseEntity<TipoEventoResponseDto> atualizar(@PathVariable int id, @RequestBody @Valid TipoEventoRequestDto tipoEventoRequestDto){
+        tipoEventoStrategy.buscarPorId(id);
 
-            return ResponseEntity.status(200).body(itemAtualizado);
-        }
+        TipoEvento tipoEvento = TipoEventoMapper.toEntity(tipoEventoRequestDto);
+        tipoEvento.setId(id);
+        TipoEvento tipoEventoSalvo = tipoEventoStrategy.salvar(tipoEvento);
+        TipoEventoResponseDto tipoEventoResponseDto = TipoEventoMapper.toResponseDto(tipoEventoSalvo);
 
-        return ResponseEntity.status(404).build();
+        return ok(tipoEventoResponseDto);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable int id){
-        if (itemCardapioStrategy.buscarPorId(id).isPresent()){
-            itemCardapioStrategy.deletar(id);
+        tipoEventoStrategy.buscarPorId(id);
 
-            return ResponseEntity.status(204).build();
-        }
-
-        return ResponseEntity.status(404).build();
+        tipoEventoStrategy.deletar(id);
+        return noContent().build();
     }
 }
