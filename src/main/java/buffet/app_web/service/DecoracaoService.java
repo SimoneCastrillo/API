@@ -30,13 +30,6 @@ public class DecoracaoService implements DecoracaoStrategy {
         return decoracaoRepository.save(decoracao);
     }
 
-    public Decoracao atualizar(Decoracao decoracao) {
-        buscarPorId(decoracao.getId());
-        decoracao.setId(decoracao.getId());
-
-        return decoracaoRepository.save(decoracao);
-    }
-
     @Override
     public void deletar(int id) {
         Decoracao decoracao = buscarPorId(id);
