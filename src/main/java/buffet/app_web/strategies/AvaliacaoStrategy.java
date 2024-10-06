@@ -9,5 +9,7 @@ public interface AvaliacaoStrategy {
     Avaliacao buscarPorId(int id);
     Avaliacao salvar(Avaliacao avaliacao);
     void deletar(int id);
+    List<Avaliacao> listarUltimos5();
+    List<Avaliacao> listarPorTipoDeEvento(String nome);
 
 }

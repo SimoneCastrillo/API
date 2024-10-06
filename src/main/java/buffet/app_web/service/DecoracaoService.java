@@ -1,6 +1,7 @@
 package buffet.app_web.service;
 
 import buffet.app_web.entities.Decoracao;
+import buffet.app_web.entities.TipoEvento;
 import buffet.app_web.repositories.DecoracaoRepository;
 import buffet.app_web.strategies.DecoracaoStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,5 +35,10 @@ public class DecoracaoService implements DecoracaoStrategy {
     public void deletar(int id) {
         Decoracao decoracao = buscarPorId(id);
         decoracaoRepository.deleteById(decoracao.getId());
+    }
+
+    @Override
+    public List<Decoracao> listarPorTipoDeEvento(String nome) {
+        return decoracaoRepository.findByTipoEventoNome(nome);
     }
 }

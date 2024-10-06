@@ -62,4 +62,27 @@ public class AvaliacaoController {
         avaliacaoStrategy.deletar(id);
         return noContent().build();
     }
+
+    @GetMapping("/ultimos")
+    public ResponseEntity<List<AvaliacaoResponseDto>> listarUltimos5(){
+        if (avaliacaoStrategy.listarUltimos5().isEmpty()){
+            return noContent().build();
+        }
+
+        List<AvaliacaoResponseDto> listaDto =
+                avaliacaoStrategy.listarUltimos5().stream().map(AvaliacaoMapper::toResponseDto).toList();
+        return ok(listaDto);
+    }
+
+    @GetMapping("/tipo-de-evento")
+    public ResponseEntity<List<AvaliacaoResponseDto>> listarPorTipoDeEvento(@RequestParam String nome){
+        if (avaliacaoStrategy.listarPorTipoDeEvento(nome).isEmpty()){
+            return noContent().build();
+        }
+
+        List<AvaliacaoResponseDto> listaDto =
+                avaliacaoStrategy.listarPorTipoDeEvento(nome).stream().map(AvaliacaoMapper::toResponseDto).toList();
+        return ok(listaDto);
+    }
+
 }

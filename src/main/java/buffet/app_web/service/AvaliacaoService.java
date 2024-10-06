@@ -42,4 +42,14 @@ public class AvaliacaoService implements AvaliacaoStrategy {
         Avaliacao avaliacao = buscarPorId(id);
         avaliacaoRepository.deleteById(avaliacao.getId());
     }
+
+    @Override
+    public List<Avaliacao> listarUltimos5() {
+        return avaliacaoRepository.findTop5ByOrderByIdDesc();
+    }
+
+    @Override
+    public List<Avaliacao> listarPorTipoDeEvento(String nome) {
+        return avaliacaoRepository.findByTipoEventoNome(nome);
+    }
 }
