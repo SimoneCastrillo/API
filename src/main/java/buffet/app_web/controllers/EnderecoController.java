@@ -2,6 +2,12 @@ package buffet.app_web.controllers;
 
 import buffet.app_web.entities.Endereco;
 import buffet.app_web.entities.EnderecoApiExterna;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +23,29 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/enderecos")
+@Tag(name = "Endereços", description = "Operações relacionadas a endereços")
 public class EnderecoController {
     Endereco enderecos[] = new Endereco[9];
     int tamanhoAtual = 0;
 
     private static final Logger log = LoggerFactory.getLogger(EnderecoController.class);
 
+    @Operation(summary = "Buscar endereço por CEP", description = """
+            # Buscar endereço
+            ---
+            Retorna o endereço correspondente ao CEP fornecido.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Endereço encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Endereco.class)
+                    )
+            ),
+            @ApiResponse(responseCode = "204", description = "Nenhum endereço encontrado para o CEP",
+                    content = @Content()
+            )
+    })
     @GetMapping
     public ResponseEntity<Endereco> buscarEndereco(@RequestParam String cep) {
 
@@ -86,6 +109,19 @@ public class EnderecoController {
         }
     }
 
+    @Operation(summary = "Exibir dados de endereços ordenados", description = """
+            # Dados de endereços ordenados
+            ---
+            Retorna a lista de endereços ordenados pelo CEP.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de endereços ordenados",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Endereco[].class)
+                    )
+            )
+    })
     @GetMapping("/dados-ordenados")
     public Endereco[] exibirDadosOrdenados(){
         return enderecos;
