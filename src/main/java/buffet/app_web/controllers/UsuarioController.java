@@ -1,7 +1,9 @@
 package buffet.app_web.controllers;
 
+import buffet.app_web.dto.request.usuario.UsuarioRequestDto;
+import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
 import buffet.app_web.entities.Usuario;
-import buffet.app_web.service.UsuarioService;
+import buffet.app_web.mapper.UsuarioMapper;
 import buffet.app_web.strategies.UsuarioStrategy;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -16,7 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+
+import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -42,12 +45,15 @@ public class UsuarioController {
             )
     })
     @GetMapping
-    public ResponseEntity<List<Usuario>> listarTodos(){
+    public ResponseEntity<List<UsuarioResponseDto>> listarTodos(){
         if (usuarioStrategy.listarTodos().isEmpty()){
-            return ResponseEntity.status(204).build();
+            return status(204).build();
         }
 
-        return ResponseEntity.status(200).body(usuarioStrategy.listarTodos());
+        List<UsuarioResponseDto> listaDto =
+                usuarioStrategy.listarTodos().stream().map(UsuarioMapper::toResponseDto).toList();
+
+        return ok(listaDto);
     }
 
     @Operation(summary = "Buscar um usuário por ID", description = """
@@ -67,14 +73,8 @@ public class UsuarioController {
             )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> buscarPorId(@PathVariable int id){
-        Optional<Usuario> usuarioOpt = usuarioStrategy.buscarPorId(id);
-
-        if (usuarioOpt.isPresent()){
-            return ResponseEntity.status(200).body(usuarioOpt.get());
-        }
-
-        return ResponseEntity.status(404).build();
+    public ResponseEntity<UsuarioResponseDto> buscarPorId(@PathVariable int id){
+        return ok(UsuarioMapper.toResponseDto(usuarioStrategy.buscarPorId(id)));
     }
 
     @Operation(summary = "Criar um novo usuário", description = """
@@ -91,9 +91,13 @@ public class UsuarioController {
             )
     })
     @PostMapping
-    public ResponseEntity<Usuario> criar(@RequestBody @Valid Usuario usuario){
-        usuario.setId(null);
-        return ResponseEntity.status(201).body(usuarioStrategy.salvar(usuario));
+    public ResponseEntity<UsuarioResponseDto> criar(@RequestBody @Valid UsuarioRequestDto usuarioRequestDto){
+        Usuario usuario = UsuarioMapper.toEntity(usuarioRequestDto);
+        Usuario usuarioSalvo = usuarioStrategy.salvar(usuario);
+        UsuarioResponseDto usuarioResponseDto = UsuarioMapper.toResponseDto(usuarioSalvo);
+
+        return created(null).body(usuarioResponseDto);
+
     }
 
     @Operation(summary = "Atualizar um usuário", description = """
@@ -113,15 +117,15 @@ public class UsuarioController {
             )
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> atualizar(@PathVariable int id, @RequestBody @Valid Usuario usuarioAtualizado){
-        if(usuarioStrategy.buscarPorId(id).isPresent()){
-            usuarioAtualizado.setId(id);
-            usuarioStrategy.salvar(usuarioAtualizado);
+    public ResponseEntity<UsuarioResponseDto> atualizar(@PathVariable int id, @RequestBody @Valid UsuarioRequestDto usuarioRequestDto){
+        usuarioStrategy.buscarPorId(id);
 
-            return ResponseEntity.status(200).body(usuarioAtualizado);
-        }
+        Usuario usuario = UsuarioMapper.toEntity(usuarioRequestDto);
+        usuario.setId(id);
+        Usuario usuarioSalvo = usuarioStrategy.salvar(usuario);
+        UsuarioResponseDto usuarioResponseDto = UsuarioMapper.toResponseDto(usuarioSalvo);
 
-        return ResponseEntity.status(404).build();
+        return ok(usuarioResponseDto);
     }
 
     @Operation(summary = "Deletar um usuário", description = """
@@ -139,12 +143,8 @@ public class UsuarioController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable int id){
-        if(usuarioStrategy.buscarPorId(id).isPresent()){
-            usuarioStrategy.deletar(id);
-
-            return ResponseEntity.status(204).build();
-        }
-        return ResponseEntity.status(404).build();
+        usuarioStrategy.buscarPorId(id);
+        usuarioStrategy.deletar(id);
+        return noContent().build();
     }
-
 }

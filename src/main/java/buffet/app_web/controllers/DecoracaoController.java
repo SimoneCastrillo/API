@@ -1,6 +1,10 @@
 package buffet.app_web.controllers;
 
+import buffet.app_web.dto.request.decoracao.DecoracaoRequestDto;
+import buffet.app_web.dto.response.decoracao.DecoracaoResponseDto;
 import buffet.app_web.entities.Decoracao;
+import buffet.app_web.entities.TipoEvento;
+import buffet.app_web.mapper.DecoracaoMapper;
 import buffet.app_web.strategies.DecoracaoStrategy;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -15,7 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+
+import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @RequestMapping("/decoracoes")
@@ -41,12 +46,14 @@ public class DecoracaoController {
             )
     })
     @GetMapping
-    public ResponseEntity<List<Decoracao>> listarTodos(){
+    public ResponseEntity<List<DecoracaoResponseDto>> listarTodos(){
         if (decoracaoStrategy.listarTodos().isEmpty()){
-            return ResponseEntity.status(204).build();
+            return noContent().build();
         }
 
-        return ResponseEntity.status(200).body(decoracaoStrategy.listarTodos());
+        List<DecoracaoResponseDto> listaDto =
+                decoracaoStrategy.listarTodos().stream().map(DecoracaoMapper::toResponseDto).toList();
+        return ok(listaDto);
     }
 
     @Operation(summary = "Buscar uma decoração por ID", description = """
@@ -66,14 +73,8 @@ public class DecoracaoController {
             )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Decoracao> buscarPorId(@PathVariable int id){
-        Optional<Decoracao> decoracaoOptional = decoracaoStrategy.buscarPorId(id);
-
-        if (decoracaoOptional.isPresent()){
-            return ResponseEntity.status(200).body(decoracaoOptional.get());
-        }
-
-        return ResponseEntity.status(404).build();
+    public ResponseEntity<DecoracaoResponseDto> buscarPorId(@PathVariable int id){
+        return ok(DecoracaoMapper.toResponseDto(decoracaoStrategy.buscarPorId(id)));
     }
 
     @Operation(summary = "Criar uma nova decoração", description = """
@@ -90,9 +91,10 @@ public class DecoracaoController {
             )
     })
     @PostMapping
-    public ResponseEntity<Decoracao> publicar(@RequestBody @Valid Decoracao decoracao){
-        decoracao.setId(null);
-        return ResponseEntity.status(201).body(decoracaoStrategy.salvar(decoracao));
+    public ResponseEntity<DecoracaoResponseDto> publicar(@RequestBody @Valid DecoracaoRequestDto decoracaoRequestDto){
+        Decoracao decoracao = decoracaoStrategy.salvar(DecoracaoMapper.toEntity(decoracaoRequestDto));
+        DecoracaoResponseDto decoracaoResponseDto = DecoracaoMapper.toResponseDto(decoracao);
+        return ok(decoracaoResponseDto);
     }
 
     @Operation(summary = "Atualizar uma decoração", description = """
@@ -112,15 +114,14 @@ public class DecoracaoController {
             )
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Decoracao> atualizar(@RequestBody @Valid Decoracao decoracao, @PathVariable int id){
-        if (decoracaoStrategy.buscarPorId(id).isPresent()){
-            decoracao.setId(id);
-            decoracaoStrategy.salvar(decoracao);
+    public ResponseEntity<DecoracaoResponseDto> atualizar(@RequestBody @Valid DecoracaoRequestDto decoracaoRequestDto, @PathVariable int id){
+        decoracaoStrategy.buscarPorId(id);
 
-            return ResponseEntity.status(200).body(decoracao);
-        }
+        Decoracao decoracao = DecoracaoMapper.toEntity(decoracaoRequestDto);
+        decoracao.setId(id);
+        Decoracao decoracaoSalva = decoracaoStrategy.salvar(decoracao);
 
-        return ResponseEntity.status(404).build();
+        return ok(DecoracaoMapper.toResponseDto(decoracaoSalva));
     }
 
     @Operation(summary = "Deletar uma decoração", description = """
@@ -138,13 +139,21 @@ public class DecoracaoController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable int id){
-        if (decoracaoStrategy.buscarPorId(id).isPresent()){
-            decoracaoStrategy.deletar(id);
+        decoracaoStrategy.buscarPorId(id);
 
-            return ResponseEntity.status(204).build();
+        decoracaoStrategy.deletar(id);
+        return noContent().build();
+    }
+
+    @GetMapping("/tipo-de-evento")
+    public ResponseEntity<List<DecoracaoResponseDto>> listarTodos(@RequestParam String nome){
+        if (decoracaoStrategy.listarPorTipoDeEvento(nome).isEmpty()){
+            return noContent().build();
         }
 
-        return ResponseEntity.status(404).build();
+        List<DecoracaoResponseDto> listaDto =
+                decoracaoStrategy.listarPorTipoDeEvento(nome).stream().map(DecoracaoMapper::toResponseDto).toList();
+        return ok(listaDto);
     }
 
 }

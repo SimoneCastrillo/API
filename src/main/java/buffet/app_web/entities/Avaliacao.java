@@ -9,12 +9,12 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Decoracao {
+public class Avaliacao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String nome;
-    private String foto;
+    private String nomeCliente;
+    private String texto;
     @ManyToOne
     private TipoEvento tipoEvento;
 }

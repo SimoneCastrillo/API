@@ -7,7 +7,8 @@ import java.util.Optional;
 
 public interface OrcamentoStrategy {
     List<Orcamento> listarTodos();
-    Optional<Orcamento> buscarPorId(Integer id);
+    Orcamento buscarPorId(Integer id);
     Orcamento salvar(Orcamento item);
     void deletar(Integer id);
+    Orcamento cancelarEvento(int id);
 }
