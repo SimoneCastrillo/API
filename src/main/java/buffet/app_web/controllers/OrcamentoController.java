@@ -4,6 +4,7 @@ import buffet.app_web.dto.request.orcamento.OrcamentoRequestDto;
 import buffet.app_web.dto.response.orcamento.OrcamentoResponseDto;
 import buffet.app_web.entities.Orcamento;
 import buffet.app_web.mapper.OrcamentoMapper;
+import buffet.app_web.service.GoogleApiService;
 import buffet.app_web.strategies.OrcamentoStrategy;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -30,6 +31,11 @@ public class OrcamentoController {
     @Autowired
     private OrcamentoStrategy orcamentoStrategy;
 
+
+    @Autowired
+    private GoogleApiService googleApiService;
+
+
     @Operation(summary = "Listar todos os orçamentos", description = """
             # Listar todos os orçamentos
             ---
@@ -46,6 +52,7 @@ public class OrcamentoController {
                     content = @Content()
             )
     })
+
     @GetMapping
     public ResponseEntity<List<OrcamentoResponseDto>> listarTodos(){
         if (orcamentoStrategy.listarTodos().isEmpty()){
@@ -99,6 +106,8 @@ public class OrcamentoController {
     public ResponseEntity<OrcamentoResponseDto> criar(@RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto){
         Orcamento orcamento = orcamentoStrategy.salvar(OrcamentoMapper.toEntity(orcamentoRequestDto));
         OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamento);
+
+        googleApiService.criarEvento(orcamento);
         return created(null).body(responseDto);
     }
 
@@ -120,7 +129,9 @@ public class OrcamentoController {
     })
     @PutMapping("/{id}")
 
-    public ResponseEntity<OrcamentoResponseDto> atualizar(@RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto, @PathVariable int id){
+    public ResponseEntity<OrcamentoResponseDto> atualizar(
+            @RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto, @PathVariable int id){
+
         orcamentoStrategy.buscarPorId(id);
 
         Orcamento orcamento = OrcamentoMapper.toEntity(orcamentoRequestDto);
