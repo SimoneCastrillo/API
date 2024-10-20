@@ -4,7 +4,7 @@ import buffet.app_web.dto.request.orcamento.OrcamentoRequestDto;
 import buffet.app_web.dto.response.orcamento.OrcamentoResponseDto;
 import buffet.app_web.entities.Orcamento;
 import buffet.app_web.mapper.OrcamentoMapper;
-import buffet.app_web.service.GoogleApiService;
+import buffet.app_web.service.GoogleService;
 import buffet.app_web.strategies.OrcamentoStrategy;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -33,7 +33,7 @@ public class OrcamentoController {
 
 
     @Autowired
-    private GoogleApiService googleApiService;
+    private GoogleService googleService;
 
 
     @Operation(summary = "Listar todos os orçamentos", description = """
@@ -107,7 +107,7 @@ public class OrcamentoController {
         Orcamento orcamento = orcamentoStrategy.salvar(OrcamentoMapper.toEntity(orcamentoRequestDto));
         OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamento);
 
-        googleApiService.criarEvento(orcamento);
+        googleService.criarEvento(orcamento);
         return created(null).body(responseDto);
     }
 
