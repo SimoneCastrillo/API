@@ -4,6 +4,8 @@ import buffet.app_web.dto.request.usuario.UsuarioRequestDto;
 import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
 import buffet.app_web.entities.Usuario;
 import buffet.app_web.mapper.UsuarioMapper;
+import buffet.app_web.service.autenticacao.dto.UsuarioLoginDto;
+import buffet.app_web.service.autenticacao.dto.UsuarioTokenDto;
 import buffet.app_web.strategies.UsuarioStrategy;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -11,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +94,7 @@ public class UsuarioController {
             )
     })
     @PostMapping
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<UsuarioResponseDto> criar(@RequestBody @Valid UsuarioRequestDto usuarioRequestDto){
         Usuario usuario = UsuarioMapper.toEntity(usuarioRequestDto);
         Usuario usuarioSalvo = usuarioStrategy.salvar(usuario);
@@ -146,5 +150,11 @@ public class UsuarioController {
         usuarioStrategy.buscarPorId(id);
         usuarioStrategy.deletar(id);
         return noContent().build();
+    }
+    @PostMapping("/login")
+    public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto) {
+        UsuarioTokenDto usuarioTokenDto = this.usuarioStrategy.autenticar(usuarioLoginDto);
+
+        return ResponseEntity.status(200).body(usuarioTokenDto);
     }
 }
