@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @RequestMapping("/decoracoes")
+@CrossOrigin(origins = "http://localhost:3000")
 @Tag(name = "Decorações", description = "Operações relacionadas a decorações")
 public class DecoracaoController {
     @Autowired
@@ -90,11 +92,13 @@ public class DecoracaoController {
                     )
             )
     })
-    @PostMapping
-    public ResponseEntity<DecoracaoResponseDto> publicar(@RequestBody @Valid DecoracaoRequestDto decoracaoRequestDto){
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DecoracaoResponseDto> publicar(@ModelAttribute @Valid DecoracaoRequestDto decoracaoRequestDto) {
+        System.out.println("Recebendo requisição para publicar decoração: {}" + decoracaoRequestDto.getNome());
         Decoracao decoracao = decoracaoStrategy.salvar(DecoracaoMapper.toEntity(decoracaoRequestDto));
+        System.out.println("Decoração salva com sucesso: {}" + decoracao.getId());
         DecoracaoResponseDto decoracaoResponseDto = DecoracaoMapper.toResponseDto(decoracao);
-        return ok(decoracaoResponseDto);
+        return ResponseEntity.ok(decoracaoResponseDto);
     }
 
     @Operation(summary = "Atualizar uma decoração", description = """

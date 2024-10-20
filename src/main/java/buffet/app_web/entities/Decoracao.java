@@ -3,6 +3,8 @@ package buffet.app_web.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Base64;
+
 @Getter
 @Setter
 @Builder
@@ -14,7 +16,10 @@ public class Decoracao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String nome;
+    @Column(columnDefinition = "VARCHAR(MAX)")
     private String foto;
     @ManyToOne
     private TipoEvento tipoEvento;
+
+
 }
