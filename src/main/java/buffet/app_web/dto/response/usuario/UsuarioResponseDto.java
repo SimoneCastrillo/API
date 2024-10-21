@@ -11,4 +11,5 @@ public class UsuarioResponseDto {
     private String email;
     private String senha;
     private String telefone;
+    private String foto;
 }

@@ -1,6 +1,9 @@
 package buffet.app_web.service;
 
+import buffet.app_web.entities.Decoracao;
 import buffet.app_web.entities.Orcamento;
+import buffet.app_web.entities.TipoEvento;
+import buffet.app_web.entities.Usuario;
 import buffet.app_web.repositories.OrcamentoRepository;
 import buffet.app_web.strategies.OrcamentoStrategy;
 import org.aspectj.weaver.ast.Or;
@@ -18,6 +21,14 @@ public class OrcamentoService implements OrcamentoStrategy {
     @Autowired
     private OrcamentoRepository orcamentoRepository;
 
+    @Autowired
+    private TipoEventoService tipoEventoService;
+
+    @Autowired
+    private UsuarioService usuarioService;
+    @Autowired
+    private DecoracaoService decoracaoService;
+
     @Override
     public List<Orcamento> listarTodos() {
         return orcamentoRepository.findAll();
@@ -29,7 +40,15 @@ public class OrcamentoService implements OrcamentoStrategy {
     }
 
     @Override
-    public Orcamento salvar(Orcamento orcamento) {
+    public Orcamento salvar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId) {
+        TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
+        Usuario usuario = usuarioService.buscarPorId(usuarioId);
+        Decoracao decoracao = decoracaoService.buscarPorId(decoracaoId);
+
+        orcamento.setTipoEvento(tipoEvento);
+        orcamento.setUsuario(usuario);
+        orcamento.setDecoracao(decoracao);
+
         return orcamentoRepository.save(orcamento);
     }
 

@@ -28,9 +28,9 @@ public class OrcamentoRequestDto {
     private LocalTime fim;
     private String sugestao;
     @NotNull
-    private TipoEvento tipoEvento;
+    private Integer tipoEventoId;
     @NotNull
-    private Usuario usuario;
+    private Integer usuarioId;
     @NotNull
-    private Decoracao decoracao;
+    private Integer decoracaoId;
 }
