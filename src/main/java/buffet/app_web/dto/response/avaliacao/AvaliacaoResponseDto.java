@@ -10,5 +10,13 @@ public class AvaliacaoResponseDto {
     private Integer id;
     private String nomeCliente;
     private String texto;
-    private TipoEvento tipoEvento;
+    private TipoEventoDto tipoEvento;
+    private String foto;
+
+    @Data
+    @Builder
+    public static class TipoEventoDto {
+        private Integer id;
+        private String nome;
+    }
 }

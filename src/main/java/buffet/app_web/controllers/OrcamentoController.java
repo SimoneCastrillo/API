@@ -103,8 +103,16 @@ public class OrcamentoController {
             )
     })
     @PostMapping
-    public ResponseEntity<OrcamentoResponseDto> criar(@RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto){
-        Orcamento orcamento = orcamentoStrategy.salvar(OrcamentoMapper.toEntity(orcamentoRequestDto));
+    public ResponseEntity<OrcamentoResponseDto> criar(
+            @RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto
+    ){
+
+        Integer tipoEventoId = orcamentoRequestDto.getTipoEventoId();
+        Integer usuarioId = orcamentoRequestDto.getUsuarioId();
+        Integer decoracaoId = orcamentoRequestDto.getDecoracaoId();
+
+        Orcamento orcamento = orcamentoStrategy.salvar(
+                OrcamentoMapper.toEntity(orcamentoRequestDto), tipoEventoId, usuarioId, decoracaoId);
         OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamento);
 
         googleService.criarEvento(orcamento);
@@ -130,14 +138,18 @@ public class OrcamentoController {
     @PutMapping("/{id}")
 
     public ResponseEntity<OrcamentoResponseDto> atualizar(
-            @RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto, @PathVariable int id){
+            @RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto, @PathVariable int id,
+            Integer tipoEventoId,
+            Integer usuarioId,
+            Integer decoracaoId
+    ){
 
         orcamentoStrategy.buscarPorId(id);
 
         Orcamento orcamento = OrcamentoMapper.toEntity(orcamentoRequestDto);
         orcamento.setId(id);
 
-        Orcamento orcamentoSalvo = orcamentoStrategy.salvar(orcamento);
+        Orcamento orcamentoSalvo = orcamentoStrategy.salvar(orcamento, tipoEventoId, usuarioId, decoracaoId);
 
         OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamentoSalvo);
 

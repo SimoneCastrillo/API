@@ -16,6 +16,8 @@ import java.util.Optional;
 public class DecoracaoService implements DecoracaoStrategy {
     @Autowired
     private DecoracaoRepository decoracaoRepository;
+    @Autowired
+    private TipoEventoService tipoEventoService;
     @Override
     public List<Decoracao> listarTodos() {
         return decoracaoRepository.findAll();
@@ -27,7 +29,10 @@ public class DecoracaoService implements DecoracaoStrategy {
     }
 
     @Override
-    public Decoracao salvar(Decoracao decoracao) {
+    public Decoracao salvar(Decoracao decoracao, Integer tipoEventoId) {
+        TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
+        decoracao.setTipoEvento(tipoEvento);
+
         return decoracaoRepository.save(decoracao);
     }
 

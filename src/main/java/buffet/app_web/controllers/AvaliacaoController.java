@@ -7,6 +7,7 @@ import buffet.app_web.mapper.AvaliacaoMapper;
 import buffet.app_web.strategies.AvaliacaoStrategy;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +38,9 @@ public class AvaliacaoController {
         return ok(AvaliacaoMapper.toResponseDto(avaliacaoStrategy.buscarPorId(id)));
     }
 
-    @PostMapping
-    public ResponseEntity<AvaliacaoResponseDto> publicar(@RequestBody @Valid AvaliacaoRequestDto avaliacaoRequestDto){
-        Avaliacao avaliacao = avaliacaoStrategy.salvar(AvaliacaoMapper.toEntity(avaliacaoRequestDto));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AvaliacaoResponseDto> publicar(@ModelAttribute @Valid AvaliacaoRequestDto avaliacaoRequestDto){
+        Avaliacao avaliacao = avaliacaoStrategy.salvar(AvaliacaoMapper.toEntity(avaliacaoRequestDto), avaliacaoRequestDto.getTipoEventoId());
         AvaliacaoResponseDto avaliacaoResponseDto = AvaliacaoMapper.toResponseDto(avaliacao);
         return ok(avaliacaoResponseDto);
     }
@@ -50,7 +51,7 @@ public class AvaliacaoController {
 
         Avaliacao avaliacao = AvaliacaoMapper.toEntity(avaliacaoRequestDto);
         avaliacao.setId(id);
-        Avaliacao avaliacaoSalva = avaliacaoStrategy.salvar(avaliacao);
+        Avaliacao avaliacaoSalva = avaliacaoStrategy.salvar(avaliacao, avaliacaoRequestDto.getTipoEventoId());
 
         return ok(AvaliacaoMapper.toResponseDto(avaliacaoSalva));
     }

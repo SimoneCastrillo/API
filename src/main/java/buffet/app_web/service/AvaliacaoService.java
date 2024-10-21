@@ -1,6 +1,7 @@
 package buffet.app_web.service;
 
 import buffet.app_web.entities.Avaliacao;
+import buffet.app_web.entities.TipoEvento;
 import buffet.app_web.repositories.AvaliacaoRepository;
 import buffet.app_web.strategies.AvaliacaoStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import java.util.List;
 public class AvaliacaoService implements AvaliacaoStrategy {
     @Autowired
     private AvaliacaoRepository avaliacaoRepository;
+    @Autowired
+    private TipoEventoService tipoEventoService;
 
     @Override
     public List<Avaliacao> listarTodos() {
@@ -26,7 +29,10 @@ public class AvaliacaoService implements AvaliacaoStrategy {
     }
 
     @Override
-    public Avaliacao salvar(Avaliacao avaliacao) {
+    public Avaliacao salvar(Avaliacao avaliacao, Integer tipoEventoId) {
+        TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
+        avaliacao.setTipoEvento(tipoEvento);
+
         return avaliacaoRepository.save(avaliacao);
     }
 

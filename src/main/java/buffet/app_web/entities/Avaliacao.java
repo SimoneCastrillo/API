@@ -17,4 +17,6 @@ public class Avaliacao {
     private String texto;
     @ManyToOne
     private TipoEvento tipoEvento;
+    @Column(columnDefinition = "VARCHAR(MAX)")
+    private String foto;
 }

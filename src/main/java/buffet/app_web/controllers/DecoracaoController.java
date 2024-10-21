@@ -93,9 +93,9 @@ public class DecoracaoController {
             )
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<DecoracaoResponseDto> publicar(@ModelAttribute @Valid DecoracaoRequestDto decoracaoRequestDto) {
+    public ResponseEntity<DecoracaoResponseDto> publicar(@ModelAttribute @Valid DecoracaoRequestDto decoracaoRequestDto, Integer tipoEventoId) {
         System.out.println("Recebendo requisição para publicar decoração: {}" + decoracaoRequestDto.getNome());
-        Decoracao decoracao = decoracaoStrategy.salvar(DecoracaoMapper.toEntity(decoracaoRequestDto));
+        Decoracao decoracao = decoracaoStrategy.salvar(DecoracaoMapper.toEntity(decoracaoRequestDto), tipoEventoId);
         System.out.println("Decoração salva com sucesso: {}" + decoracao.getId());
         DecoracaoResponseDto decoracaoResponseDto = DecoracaoMapper.toResponseDto(decoracao);
         return ResponseEntity.ok(decoracaoResponseDto);
@@ -118,12 +118,12 @@ public class DecoracaoController {
             )
     })
     @PutMapping("/{id}")
-    public ResponseEntity<DecoracaoResponseDto> atualizar(@RequestBody @Valid DecoracaoRequestDto decoracaoRequestDto, @PathVariable int id){
+    public ResponseEntity<DecoracaoResponseDto> atualizar(@RequestBody @Valid DecoracaoRequestDto decoracaoRequestDto, @PathVariable int id, Integer tipoEventoId){
         decoracaoStrategy.buscarPorId(id);
 
         Decoracao decoracao = DecoracaoMapper.toEntity(decoracaoRequestDto);
         decoracao.setId(id);
-        Decoracao decoracaoSalva = decoracaoStrategy.salvar(decoracao);
+        Decoracao decoracaoSalva = decoracaoStrategy.salvar(decoracao, tipoEventoId);
 
         return ok(DecoracaoMapper.toResponseDto(decoracaoSalva));
     }
