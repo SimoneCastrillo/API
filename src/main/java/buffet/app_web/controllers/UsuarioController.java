@@ -152,6 +152,23 @@ public class UsuarioController {
         usuarioStrategy.deletar(id);
         return noContent().build();
     }
+
+    @Operation(summary = "Logar usuário", description = """
+            # Logar Usuário
+            ---
+            Autentica o usuário e retorna um token de acesso.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário logado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Usuario.class)
+                    )
+            ),
+            @ApiResponse(responseCode = "401", description = "Login inválido",
+                    content = @Content()
+            )
+    })
     @PostMapping("/login")
     public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto) {
         UsuarioTokenDto usuarioTokenDto = this.usuarioStrategy.autenticar(usuarioLoginDto);

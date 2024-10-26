@@ -4,6 +4,7 @@ import buffet.app_web.dto.request.orcamento.OrcamentoRequestDto;
 import buffet.app_web.dto.response.orcamento.OrcamentoResponseDto;
 import buffet.app_web.entities.Orcamento;
 import buffet.app_web.mapper.OrcamentoMapper;
+import buffet.app_web.service.ExportacaoService;
 import buffet.app_web.service.GoogleService;
 import buffet.app_web.strategies.OrcamentoStrategy;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,8 @@ public class OrcamentoController {
     @Autowired
     private OrcamentoStrategy orcamentoStrategy;
 
+    @Autowired
+    private ExportacaoService exportacaoService;
 
     @Autowired
     private GoogleService googleService;
@@ -52,7 +55,6 @@ public class OrcamentoController {
                     content = @Content()
             )
     })
-
     @GetMapping
     public ResponseEntity<List<OrcamentoResponseDto>> listarTodos(){
         if (orcamentoStrategy.listarTodos().isEmpty()){
@@ -65,6 +67,7 @@ public class OrcamentoController {
                         .map(OrcamentoMapper::toResponseDto)
                         .toList();
 
+        exportacaoService.exportarOrcamento();
         return ok(listaDto);
     }
 
@@ -136,7 +139,6 @@ public class OrcamentoController {
             )
     })
     @PutMapping("/{id}")
-
     public ResponseEntity<OrcamentoResponseDto> atualizar(
             @RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto, @PathVariable int id,
             Integer tipoEventoId,
@@ -155,6 +157,7 @@ public class OrcamentoController {
 
         return ok(responseDto);
     }
+
     @Operation(summary = "Deletar um orçamento", description = """
             # Deletar orçamento
             ---
@@ -176,6 +179,19 @@ public class OrcamentoController {
         return noContent().build();
     }
 
+    @Operation(summary = "Cancelar Evento", description = """
+        # Cancelar Evento
+        ---
+        Cancela um evento baseado no ID fornecido.
+        """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Evento cancelado com sucesso",
+                    content = @Content()
+            ),
+            @ApiResponse(responseCode = "404", description = "Evento não encontrado",
+                    content = @Content()
+            )
+    })
     @PatchMapping("/{id}/cancelamento")
     public ResponseEntity<Orcamento> cancelarEvento(@PathVariable int id){
         orcamentoStrategy.cancelarEvento(id);

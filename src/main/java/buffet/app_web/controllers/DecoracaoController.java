@@ -149,6 +149,25 @@ public class DecoracaoController {
         return noContent().build();
     }
 
+    @Operation(summary = "Listar Decorações por Tipo de Evento", description = """
+        # Listar Decorações
+        ---
+        Retorna uma lista de decorações filtradas pelo tipo de evento especificado.
+        """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Decorações listadas com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = DecoracaoResponseDto.class))
+                    )
+            ),
+            @ApiResponse(responseCode = "204", description = "Nenhuma decoração encontrada para o tipo de evento especificado",
+                    content = @Content()
+            ),
+            @ApiResponse(responseCode = "400", description = "Requisição inválida",
+                    content = @Content()
+            )
+    })
     @GetMapping("/tipo-de-evento")
     public ResponseEntity<List<DecoracaoResponseDto>> listarTodos(@RequestParam String nome){
         if (decoracaoStrategy.listarPorTipoDeEvento(nome).isEmpty()){
