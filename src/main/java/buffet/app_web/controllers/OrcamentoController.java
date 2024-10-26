@@ -67,6 +67,7 @@ public class OrcamentoController {
                         .map(OrcamentoMapper::toResponseDto)
                         .toList();
 
+        exportacaoService.exportarOrcamento();
         return ok(listaDto);
     }
 
