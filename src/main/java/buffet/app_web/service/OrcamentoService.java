@@ -71,4 +71,8 @@ public class OrcamentoService implements OrcamentoStrategy {
         orcamento.setStatus(orcamento.getStatus());
         return orcamentoRepository.save(orcamento);
     }
+
+    public Integer countByUsuarioId(Integer usuarioId){
+        return orcamentoRepository.countByUsuarioId(usuarioId);
+    }
 }

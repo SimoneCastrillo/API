@@ -2,22 +2,25 @@ package buffet.app_web.service.autenticacao.dto;
 
 public class UsuarioTokenDto {
 
-    private long userId;
+    private long id;
 
     private String nome;
 
     private String email;
 
     private String telefone;
+    private Integer qtdOrcamento;
 
     private String token;
 
-    public long getUserId() {
-        return userId;
+    private String foto;
+
+    public long getId() {
+        return id;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getNome() {
@@ -44,11 +47,27 @@ public class UsuarioTokenDto {
         this.telefone = telefone;
     }
 
+    public Integer getQtdOrcamento() {
+        return qtdOrcamento;
+    }
+
+    public void setQtdOrcamento(Integer qtdOrcamento) {
+        this.qtdOrcamento = qtdOrcamento;
+    }
+
     public String getToken() {
         return token;
     }
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 }
