@@ -55,6 +55,10 @@ public class UsuarioService implements UsuarioStrategy {
         return  usuarioRepository.save(usuario);
     }
 
+    public Usuario atualizar(Usuario usuario){
+        return usuarioRepository.save(usuario);
+    }
+
     public void deletar(Integer id){
         buscarPorId(id);
         usuarioRepository.deleteById(id);
