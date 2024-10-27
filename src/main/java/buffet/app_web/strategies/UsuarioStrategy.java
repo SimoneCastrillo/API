@@ -11,6 +11,7 @@ public interface UsuarioStrategy {
     List<Usuario> listarTodos();
     Usuario buscarPorId(Integer id);
     Usuario salvar(Usuario usuario);
+    Usuario atualizar(Usuario usuario);
     void deletar(Integer id);
     UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto);
 }

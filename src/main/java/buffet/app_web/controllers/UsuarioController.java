@@ -2,9 +2,11 @@ package buffet.app_web.controllers;
 
 import buffet.app_web.dto.request.usuario.UsuarioCriacaoDto;
 import buffet.app_web.dto.request.usuario.UsuarioRequestDto;
+import buffet.app_web.dto.response.usuario.UsuarioPorIdResponseDto;
 import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
 import buffet.app_web.entities.Usuario;
 import buffet.app_web.mapper.UsuarioMapper;
+import buffet.app_web.service.OrcamentoService;
 import buffet.app_web.service.autenticacao.dto.UsuarioLoginDto;
 import buffet.app_web.service.autenticacao.dto.UsuarioTokenDto;
 import buffet.app_web.strategies.UsuarioStrategy;
@@ -32,6 +34,9 @@ import static org.springframework.http.ResponseEntity.*;
 public class UsuarioController {
     @Autowired
     private UsuarioStrategy usuarioStrategy;
+
+    @Autowired
+    private OrcamentoService orcamentoService;
 
     @Operation(summary = "Listar todos os usuários", description = """
             # Listar todos os usuários
@@ -78,8 +83,11 @@ public class UsuarioController {
             )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDto> buscarPorId(@PathVariable int id){
-        return ok(UsuarioMapper.toResponseDto(usuarioStrategy.buscarPorId(id)));
+    public ResponseEntity<UsuarioPorIdResponseDto> buscarPorId(@PathVariable int id){
+        Usuario usuario = usuarioStrategy.buscarPorId(id);
+        UsuarioPorIdResponseDto usuarioResponseDto = UsuarioMapper.toResponsePorIdDto(usuario);
+        usuarioResponseDto.setQtdOrcamento(orcamentoService.countByUsuarioId(id));
+        return ok(usuarioResponseDto);
     }
 
     @Operation(summary = "Criar um novo usuário", description = """
@@ -123,13 +131,15 @@ public class UsuarioController {
             )
     })
 
-    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UsuarioResponseDto> atualizar(@PathVariable int id, @ModelAttribute @Valid UsuarioRequestDto usuarioRequestDto){
         usuarioStrategy.buscarPorId(id);
+        String senha = usuarioStrategy.buscarPorId(id).getSenha();
 
         Usuario usuario = UsuarioMapper.toEntity(usuarioRequestDto);
         usuario.setId(id);
-        Usuario usuarioSalvo = usuarioStrategy.salvar(usuario);
+        usuario.setSenha(senha);
+        Usuario usuarioSalvo = usuarioStrategy.atualizar(usuario);
         UsuarioResponseDto usuarioResponseDto = UsuarioMapper.toResponseDto(usuarioSalvo);
 
         return ok(usuarioResponseDto);

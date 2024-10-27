@@ -2,6 +2,7 @@ package buffet.app_web.mapper;
 
 import buffet.app_web.dto.request.usuario.UsuarioCriacaoDto;
 import buffet.app_web.dto.request.usuario.UsuarioRequestDto;
+import buffet.app_web.dto.response.usuario.UsuarioPorIdResponseDto;
 import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
 import buffet.app_web.entities.Usuario;
 import buffet.app_web.service.autenticacao.dto.UsuarioTokenDto;
@@ -14,6 +15,20 @@ public class UsuarioMapper {
         if (usuario == null) return null;
 
         return UsuarioResponseDto
+                .builder()
+                .id(usuario.getId())
+                .nome(usuario.getNome())
+                .email(usuario.getEmail())
+                .senha(usuario.getSenha())
+                .foto(usuario.getFoto())
+                .telefone(usuario.getTelefone())
+                .build();
+    }
+
+    public static UsuarioPorIdResponseDto toResponsePorIdDto(Usuario usuario){
+        if (usuario == null) return null;
+
+        return UsuarioPorIdResponseDto
                 .builder()
                 .id(usuario.getId())
                 .nome(usuario.getNome())
@@ -41,7 +56,6 @@ public class UsuarioMapper {
                 .builder()
                 .nome(dto.getNome())
                 .email(dto.getEmail())
-                .senha(dto.getSenha())
                 .telefone(dto.getTelefone())
                 .foto(base64Image)
                 .build();
