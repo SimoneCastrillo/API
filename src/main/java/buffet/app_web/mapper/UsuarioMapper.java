@@ -1,5 +1,6 @@
 package buffet.app_web.mapper;
 
+import buffet.app_web.dto.request.usuario.UsuarioCriacaoDto;
 import buffet.app_web.dto.request.usuario.UsuarioRequestDto;
 import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
 import buffet.app_web.entities.Usuario;
@@ -43,6 +44,19 @@ public class UsuarioMapper {
                 .senha(dto.getSenha())
                 .telefone(dto.getTelefone())
                 .foto(base64Image)
+                .build();
+    }
+
+    public static Usuario toEntity(UsuarioCriacaoDto dto){
+        if (dto == null) return null;
+
+
+        return Usuario
+                .builder()
+                .nome(dto.getNome())
+                .email(dto.getEmail())
+                .senha(dto.getSenha())
+                .telefone(dto.getTelefone())
                 .build();
     }
 

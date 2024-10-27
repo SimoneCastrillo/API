@@ -1,5 +1,6 @@
 package buffet.app_web.controllers;
 
+import buffet.app_web.dto.request.usuario.UsuarioCriacaoDto;
 import buffet.app_web.dto.request.usuario.UsuarioRequestDto;
 import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
 import buffet.app_web.entities.Usuario;
@@ -94,10 +95,10 @@ public class UsuarioController {
                     )
             )
     })
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<UsuarioResponseDto> criar(@ModelAttribute @Valid UsuarioRequestDto usuarioRequestDto){
-        Usuario usuario = UsuarioMapper.toEntity(usuarioRequestDto);
+    public ResponseEntity<UsuarioResponseDto> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto){
+        Usuario usuario = UsuarioMapper.toEntity(usuarioCriacaoDto);
         Usuario usuarioSalvo = usuarioStrategy.salvar(usuario);
         UsuarioResponseDto usuarioResponseDto = UsuarioMapper.toResponseDto(usuarioSalvo);
 
@@ -121,8 +122,9 @@ public class UsuarioController {
                     content = @Content()
             )
     })
-    @PutMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDto> atualizar(@PathVariable int id, @RequestBody @Valid UsuarioRequestDto usuarioRequestDto){
+
+    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UsuarioResponseDto> atualizar(@PathVariable int id, @ModelAttribute @Valid UsuarioRequestDto usuarioRequestDto){
         usuarioStrategy.buscarPorId(id);
 
         Usuario usuario = UsuarioMapper.toEntity(usuarioRequestDto);
