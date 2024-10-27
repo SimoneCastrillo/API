@@ -3,6 +3,7 @@ package buffet.app_web.service;
 import buffet.app_web.configuration.security.jwt.GerenciadorTokenJwt;
 import buffet.app_web.entities.Usuario;
 import buffet.app_web.mapper.UsuarioMapper;
+import buffet.app_web.repositories.OrcamentoRepository;
 import buffet.app_web.repositories.UsuarioRepository;
 import buffet.app_web.service.autenticacao.dto.UsuarioLoginDto;
 import buffet.app_web.service.autenticacao.dto.UsuarioTokenDto;
@@ -35,6 +36,9 @@ public class UsuarioService implements UsuarioStrategy {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private OrcamentoRepository orcamentoRepository;
 
 
     public List<Usuario> listarTodos(){
@@ -72,8 +76,8 @@ public class UsuarioService implements UsuarioStrategy {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         final String token = gerenciadorTokenJwt.generateToken(authentication);
+        Integer qtdOrcamento = orcamentoRepository.countByUsuarioId(usuarioAutenticado.getId());
 
-        return UsuarioMapper.of(usuarioAutenticado, token);
+        return UsuarioMapper.of(usuarioAutenticado, token, qtdOrcamento);
     }
-
 }
