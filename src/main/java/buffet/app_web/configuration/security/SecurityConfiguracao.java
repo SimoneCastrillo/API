@@ -59,6 +59,7 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/avaliacoes/ultimos"),
             new AntPathRequestMatcher("/decoracoes"),
             new AntPathRequestMatcher("/decoracoes/tipo-de-evento"),
+            new AntPathRequestMatcher("/avaliacoes/tipo-de-evento"),
             new AntPathRequestMatcher("/api/eventos"),
             new AntPathRequestMatcher("/api/eventos/pesquisa"),
             new AntPathRequestMatcher("/api/eventos/alfabetica"),
