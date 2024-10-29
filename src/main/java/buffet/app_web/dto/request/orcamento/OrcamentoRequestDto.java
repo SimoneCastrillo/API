@@ -25,7 +25,8 @@ public class OrcamentoRequestDto {
     private Integer qtdConvidados;
     @NotNull
     private LocalTime inicio;
-    private LocalTime fim;
+    private String saborBolo;
+    private String pratoPrincipal;
     private String sugestao;
     @NotNull
     private Integer tipoEventoId;

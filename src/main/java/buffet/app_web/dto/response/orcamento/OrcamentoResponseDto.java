@@ -22,6 +22,8 @@ public class OrcamentoResponseDto {
     private Boolean cancelado;
     private LocalTime inicio;
     private LocalTime fim;
+    private String saborBolo;
+    private String pratoPrincipal;
     private String sugestao;
     private TipoEventoDto tipoEvento;
     private UsuarioDto usuario;
