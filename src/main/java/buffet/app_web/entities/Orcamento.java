@@ -23,6 +23,11 @@ public class Orcamento {
     private Boolean cancelado;
     private LocalTime inicio;
     private LocalTime fim;
+    private String saborBolo;
+    private String pratoPrincipal;
+    private Double lucro;
+    private Double faturamento;
+    private Double despesa;
     private String sugestao;
     @ManyToOne
     private TipoEvento tipoEvento;

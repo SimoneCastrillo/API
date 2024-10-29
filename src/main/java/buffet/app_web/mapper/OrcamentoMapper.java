@@ -19,7 +19,9 @@ public class OrcamentoMapper {
                 .status("ABERTO")
                 .cancelado(false)
                 .inicio(dto.getInicio())
-                .fim(dto.getFim())
+                .fim(dto.getInicio().plusHours(2))
+                .saborBolo(dto.getSaborBolo())
+                .pratoPrincipal(dto.getPratoPrincipal())
                 .sugestao(dto.getSugestao())
                 .build();
 
@@ -71,6 +73,8 @@ public class OrcamentoMapper {
                 .cancelado(orcamento.getCancelado())
                 .inicio(orcamento.getInicio())
                 .fim(orcamento.getFim())
+                .saborBolo(orcamento.getSaborBolo())
+                .pratoPrincipal(orcamento.getPratoPrincipal())
                 .sugestao(orcamento.getSugestao())
                 .tipoEvento(tipoEventoDto)
                 .usuario(usuarioDto)
