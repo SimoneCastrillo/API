@@ -1,6 +1,6 @@
 package buffet.app_web.service;
 
-import buffet.app_web.config.Google;
+import buffet.app_web.configuration.Google;
 import buffet.app_web.entities.Orcamento;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;

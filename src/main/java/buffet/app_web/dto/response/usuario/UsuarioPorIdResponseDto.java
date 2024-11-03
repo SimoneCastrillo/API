@@ -1,5 +1,6 @@
 package buffet.app_web.dto.response.usuario;
 
+import buffet.app_web.enums.UserRole;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,5 +13,6 @@ public class UsuarioPorIdResponseDto {
     private String senha;
     private String telefone;
     private Integer qtdOrcamento;
+    private UserRole role;
     private String foto;
 }

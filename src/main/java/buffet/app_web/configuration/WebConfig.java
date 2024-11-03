@@ -1,4 +1,4 @@
-package buffet.app_web.config;
+package buffet.app_web.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

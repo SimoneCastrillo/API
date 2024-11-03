@@ -15,8 +15,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -92,6 +94,7 @@ public class DecoracaoController {
                     )
             )
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DecoracaoResponseDto> publicar(@ModelAttribute @Valid DecoracaoRequestDto decoracaoRequestDto, Integer tipoEventoId) {
         System.out.println("Recebendo requisição para publicar decoração: {}" + decoracaoRequestDto.getNome());
@@ -117,6 +120,7 @@ public class DecoracaoController {
                     content = @Content()
             )
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<DecoracaoResponseDto> atualizar(@RequestBody @Valid DecoracaoRequestDto decoracaoRequestDto, @PathVariable int id, Integer tipoEventoId){
         decoracaoStrategy.buscarPorId(id);
@@ -141,6 +145,7 @@ public class DecoracaoController {
                     content = @Content()
             )
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable int id){
         decoracaoStrategy.buscarPorId(id);

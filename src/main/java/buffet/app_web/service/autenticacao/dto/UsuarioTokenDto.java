@@ -1,5 +1,7 @@
 package buffet.app_web.service.autenticacao.dto;
 
+import buffet.app_web.enums.UserRole;
+
 public class UsuarioTokenDto {
 
     private long id;
@@ -9,7 +11,10 @@ public class UsuarioTokenDto {
     private String email;
 
     private String telefone;
+
     private Integer qtdOrcamento;
+
+    private UserRole role;
 
     private String token;
 
@@ -53,6 +58,14 @@ public class UsuarioTokenDto {
 
     public void setQtdOrcamento(Integer qtdOrcamento) {
         this.qtdOrcamento = qtdOrcamento;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 
     public String getToken() {

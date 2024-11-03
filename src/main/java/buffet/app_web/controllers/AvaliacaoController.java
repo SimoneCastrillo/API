@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -91,6 +92,7 @@ public class AvaliacaoController {
                     content = @Content()
             ),
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AvaliacaoResponseDto> publicar(@ModelAttribute @Valid AvaliacaoRequestDto avaliacaoRequestDto){
         Avaliacao avaliacao = avaliacaoStrategy.salvar(AvaliacaoMapper.toEntity(avaliacaoRequestDto), avaliacaoRequestDto.getTipoEventoId());
@@ -117,6 +119,7 @@ public class AvaliacaoController {
                     content = @Content()
             ),
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<AvaliacaoResponseDto> atualizar(@RequestBody @Valid AvaliacaoRequestDto avaliacaoRequestDto, @PathVariable int id){
         avaliacaoStrategy.buscarPorId(id);
@@ -141,6 +144,7 @@ public class AvaliacaoController {
                     content = @Content()
             ),
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable int id){
         avaliacaoStrategy.buscarPorId(id);

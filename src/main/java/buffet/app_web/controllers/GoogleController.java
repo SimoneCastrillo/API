@@ -1,8 +1,7 @@
 package buffet.app_web.controllers;
 
-import buffet.app_web.config.Google;
+import buffet.app_web.configuration.Google;
 import buffet.app_web.service.GoogleService;
-import com.google.api.services.calendar.model.Event;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -81,7 +80,4 @@ public class GoogleController {
     public int pesquisaBinaria(@RequestParam String summary) throws GeneralSecurityException, IOException {
         return googleService.pesquisaBinaria(listarOrdemAlfabetica(), summary);
     }
-
-
-
 }

@@ -1,7 +1,7 @@
 package buffet.app_web.entities;
 
+import buffet.app_web.enums.UserRole;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Getter
@@ -18,6 +18,8 @@ public class Usuario {
     private String email;
     private String senha;
     private String telefone;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
     @Column(columnDefinition = "VARCHAR(MAX)")
     private String foto;
 }
