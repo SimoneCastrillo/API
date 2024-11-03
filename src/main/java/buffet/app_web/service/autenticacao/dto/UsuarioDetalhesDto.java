@@ -1,10 +1,13 @@
 package buffet.app_web.service.autenticacao.dto;
 
+import buffet.app_web.enums.UserRole;
 import buffet.app_web.entities.Usuario;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 public class UsuarioDetalhesDto implements UserDetails {
 
@@ -14,10 +17,13 @@ public class UsuarioDetalhesDto implements UserDetails {
 
     private final String senha;
 
+    private UserRole role;
+
     public UsuarioDetalhesDto(Usuario usuario) {
         this.nome = usuario.getNome();
         this.email = usuario.getEmail();
         this.senha = usuario.getSenha();
+        this.role = usuario.getRole();
     }
 
     public String getNome() {
@@ -26,7 +32,11 @@ public class UsuarioDetalhesDto implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        if (this.role == UserRole.ADMIN) return List.of(
+                new SimpleGrantedAuthority("ROLE_ADMIN"),
+                new SimpleGrantedAuthority("ROLE_USER"));
+
+        else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override

@@ -1,7 +1,6 @@
 package buffet.app_web.dto.request.usuario;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -10,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
-public class UsuarioRequestDto {
+public class UsuarioUpdateDto {
     @Size(min = 3, max = 30)
     private String nome;
 

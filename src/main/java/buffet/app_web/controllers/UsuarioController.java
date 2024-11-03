@@ -1,11 +1,12 @@
 package buffet.app_web.controllers;
 
 import buffet.app_web.dto.request.usuario.UsuarioCriacaoDto;
-import buffet.app_web.dto.request.usuario.UsuarioRequestDto;
+import buffet.app_web.dto.request.usuario.UsuarioUpdateDto;
 import buffet.app_web.dto.response.usuario.UsuarioPorIdResponseDto;
 import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
 import buffet.app_web.entities.Usuario;
 import buffet.app_web.mapper.UsuarioMapper;
+import buffet.app_web.repositories.UsuarioRepository;
 import buffet.app_web.service.OrcamentoService;
 import buffet.app_web.service.autenticacao.dto.UsuarioLoginDto;
 import buffet.app_web.service.autenticacao.dto.UsuarioTokenDto;
@@ -37,6 +38,9 @@ public class UsuarioController {
 
     @Autowired
     private OrcamentoService orcamentoService;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @Operation(summary = "Listar todos os usuários", description = """
             # Listar todos os usuários
@@ -132,11 +136,11 @@ public class UsuarioController {
     })
 
     @PatchMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UsuarioResponseDto> atualizar(@PathVariable int id, @ModelAttribute @Valid UsuarioRequestDto usuarioRequestDto){
+    public ResponseEntity<UsuarioResponseDto> atualizar(@PathVariable int id, @ModelAttribute @Valid UsuarioUpdateDto usuarioUpdateDto){
         usuarioStrategy.buscarPorId(id);
         String senha = usuarioStrategy.buscarPorId(id).getSenha();
 
-        Usuario usuario = UsuarioMapper.toEntity(usuarioRequestDto);
+        Usuario usuario = UsuarioMapper.toEntity(usuarioUpdateDto);
         usuario.setId(id);
         usuario.setSenha(senha);
         Usuario usuarioSalvo = usuarioStrategy.atualizar(usuario);

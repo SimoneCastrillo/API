@@ -1,7 +1,8 @@
 package buffet.app_web.mapper;
 
+import buffet.app_web.enums.UserRole;
 import buffet.app_web.dto.request.usuario.UsuarioCriacaoDto;
-import buffet.app_web.dto.request.usuario.UsuarioRequestDto;
+import buffet.app_web.dto.request.usuario.UsuarioUpdateDto;
 import buffet.app_web.dto.response.usuario.UsuarioPorIdResponseDto;
 import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
 import buffet.app_web.entities.Usuario;
@@ -20,8 +21,9 @@ public class UsuarioMapper {
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
                 .senha(usuario.getSenha())
-                .foto(usuario.getFoto())
                 .telefone(usuario.getTelefone())
+                .role(usuario.getRole())
+                .foto(usuario.getFoto())
                 .build();
     }
 
@@ -34,12 +36,13 @@ public class UsuarioMapper {
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
                 .senha(usuario.getSenha())
-                .foto(usuario.getFoto())
                 .telefone(usuario.getTelefone())
+                .role(usuario.getRole())
+                .foto(usuario.getFoto())
                 .build();
     }
 
-    public static Usuario toEntity(UsuarioRequestDto dto){
+    public static Usuario toEntity(UsuarioUpdateDto dto){
         if (dto == null) return null;
 
         String base64Image = null;
@@ -70,6 +73,7 @@ public class UsuarioMapper {
                 .nome(dto.getNome())
                 .email(dto.getEmail())
                 .senha(dto.getSenha())
+                .role(UserRole.USUARIO)
                 .telefone(dto.getTelefone())
                 .build();
     }
@@ -82,6 +86,7 @@ public class UsuarioMapper {
         usuarioTokenDto.setNome(usuario.getNome());
         usuarioTokenDto.setTelefone(usuario.getTelefone());
         usuarioTokenDto.setQtdOrcamento(qtdOrcamento);
+        usuarioTokenDto.setRole(usuario.getRole());
         usuarioTokenDto.setToken(token);
         usuarioTokenDto.setFoto(usuario.getFoto());
 

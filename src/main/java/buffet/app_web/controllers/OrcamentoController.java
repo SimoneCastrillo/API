@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -55,6 +56,7 @@ public class OrcamentoController {
                     content = @Content()
             )
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<List<OrcamentoResponseDto>> listarTodos(){
         if (orcamentoStrategy.listarTodos().isEmpty()){
@@ -87,6 +89,7 @@ public class OrcamentoController {
                     content = @Content()
             )
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<OrcamentoResponseDto> buscarPorId(@PathVariable int id){
         return status(200).body(OrcamentoMapper.toResponseDto(orcamentoStrategy.buscarPorId(id)));

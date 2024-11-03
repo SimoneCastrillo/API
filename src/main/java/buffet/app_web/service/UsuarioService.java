@@ -50,6 +50,10 @@ public class UsuarioService implements UsuarioStrategy {
     }
 
     public Usuario salvar(Usuario usuario){
+        if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
         String senhaCriptografada = passwordEncoder.encode(usuario.getSenha());
         usuario.setSenha(senhaCriptografada);
         return  usuarioRepository.save(usuario);

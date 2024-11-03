@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -91,6 +92,7 @@ public class TipoEventoController {
                     )
             )
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<TipoEventoResponseDto> criar(@RequestBody @Valid TipoEventoRequestDto tipoEventoRequestDto){
         TipoEvento tipoEventoSalvo = tipoEventoStrategy.salvar(TipoEventoMapper.toEntity(tipoEventoRequestDto));
@@ -115,6 +117,7 @@ public class TipoEventoController {
                     content = @Content()
             )
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<TipoEventoResponseDto> atualizar(@PathVariable int id, @RequestBody @Valid TipoEventoRequestDto tipoEventoRequestDto){
         tipoEventoStrategy.buscarPorId(id);
@@ -140,6 +143,7 @@ public class TipoEventoController {
                     content = @Content()
             )
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable int id){
         tipoEventoStrategy.buscarPorId(id);
