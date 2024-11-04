@@ -29,6 +29,7 @@ public class Orcamento {
     private Double faturamento;
     private Double despesa;
     private String sugestao;
+    private String googleEventoId;
     @ManyToOne
     private TipoEvento tipoEvento;
     @ManyToOne

@@ -25,6 +25,7 @@ public class OrcamentoResponseDto {
     private String saborBolo;
     private String pratoPrincipal;
     private String sugestao;
+    private String googleEventoId;
     private TipoEventoDto tipoEvento;
     private UsuarioDto usuario;
     private DecoracaoDto decoracao;
@@ -41,9 +42,7 @@ public class OrcamentoResponseDto {
     public static class UsuarioDto{private Integer id;
         private String nome;
         private String email;
-        private String senha;
         private String telefone;
-        private String foto;
     }
 
     @Data
@@ -52,6 +51,5 @@ public class OrcamentoResponseDto {
         private Integer id;
         private String nome;
         private DecoracaoResponseDto.TipoEventoDto tipoEvento;
-        private String foto;
     }
 }

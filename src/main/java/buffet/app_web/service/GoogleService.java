@@ -74,10 +74,53 @@ public class GoogleService {
         try {
             Google google = createGoogleFromOrcamento(orcamento);
             Event event = buildEvent(orcamento, google);
-            calendar.events().insert("primary", event).execute();
+
+            Event eventoCriado = calendar.events().insert("primary", event).execute();
+            String googleEventoId = eventoCriado.getId();
+
+            orcamento.setGoogleEventoId(googleEventoId);
         } catch (Exception e) {
-            // Melhorar o tratamento de exceção, por exemplo, usando Logger
             System.err.println("Error creating event: " + e.getMessage());
+        }
+    }
+
+    public void atualizarEvento(String calendarId, Orcamento orcamento) throws IOException, GeneralSecurityException {
+        Calendar service = getCalendarService();
+        String eventId = orcamento.getGoogleEventoId();
+
+        if (eventId != null) {
+            Event event = service.events().get(calendarId, eventId).execute();
+            event.setSummary(orcamento.getTipoEvento().getNome());
+            event.setDescription(buildDescription(orcamento));
+
+            ZoneId zoneId = ZoneId.systemDefault();
+
+            LocalDateTime inicio = LocalDateTime.of(orcamento.getDataEvento(), orcamento.getInicio());
+            long startTimeInMillis = inicio.atZone(zoneId).toInstant().toEpochMilli();
+            EventDateTime start = new EventDateTime().setDateTime(new DateTime(startTimeInMillis));
+            event.setStart(start);
+
+            LocalDateTime fim = LocalDateTime.of(orcamento.getDataEvento(), orcamento.getFim());
+            long endTimeInMillis = fim.atZone(zoneId).toInstant().toEpochMilli();
+            EventDateTime end = new EventDateTime().setDateTime(new DateTime(endTimeInMillis));
+            event.setEnd(end);
+
+            service.events().update(calendarId, eventId, event).execute();
+            System.out.println("Evento do orçamento atualizado.");
+        } else {
+            System.out.println("ID do evento não encontrado para este orçamento.");
+        }
+    }
+
+    public void deletarEvento(String calendarId, Orcamento orcamento) throws IOException, GeneralSecurityException {
+        Calendar service = getCalendarService();
+        String eventId = orcamento.getGoogleEventoId();
+
+        if (eventId != null) {
+            service.events().delete(calendarId, eventId).execute();
+            System.out.println("Evento do orçamento deletado.");
+        } else {
+            System.out.println("ID do evento não encontrado para este orçamento.");
         }
     }
 
@@ -89,8 +132,10 @@ public class GoogleService {
     }
 
     private Event buildEvent(Orcamento orcamento, Google google) {
-        DateTime startGoogleDateTime = new DateTime(ZonedDateTime.of(google.getStartDateTime(), ZoneId.systemDefault()).toInstant().toEpochMilli());
-        DateTime endGoogleDateTime = new DateTime(ZonedDateTime.of(google.getEndDateTime(), ZoneId.systemDefault()).toInstant().toEpochMilli());
+        DateTime startGoogleDateTime = new DateTime(ZonedDateTime.of(google.getStartDateTime(),
+                ZoneId.systemDefault()).toInstant().toEpochMilli());
+        DateTime endGoogleDateTime = new DateTime(ZonedDateTime.of(google.getEndDateTime(),
+                ZoneId.systemDefault()).toInstant().toEpochMilli());
 
         EventDateTime start = new EventDateTime().setDateTime(startGoogleDateTime);
         EventDateTime end = new EventDateTime().setDateTime(endGoogleDateTime);
@@ -103,11 +148,22 @@ public class GoogleService {
     }
 
     private String buildDescription(Orcamento orcamento) {
-        return String.format("Orçamento de: %s\nTelefone: %s\nDados do Orçamento:\n- Número de Convidados: %d\n- Tipo de Evento: %s\n- Sugestão: %s",
+        return String.format("Orçamento de: %s\n" +
+                        "Telefone: %s\n" +
+                        "Dados do Orçamento:\n" +
+                        "- Número de Convidados: %d\n" +
+                        "- Tipo de Evento: %s\n" +
+                        "- Status: %s\n" +
+                        "- Sabor do bolo: %s\n" +
+                        "- Prato principal: %s\n" +
+                        "- Sugestão: %s",
                 orcamento.getUsuario().getNome(),
                 orcamento.getUsuario().getTelefone(),
                 orcamento.getQtdConvidados(),
                 orcamento.getTipoEvento().getNome(),
+                orcamento.getStatus(),
+                orcamento.getSaborBolo(),
+                orcamento.getPratoPrincipal(),
                 orcamento.getSugestao());
     }
 
@@ -122,12 +178,12 @@ public class GoogleService {
 
         List<Google> listaItems = new ArrayList<>();
         for (Event event : events.getItems()) {
-            listaItems.add(createGoogleFromEvent(event));
+            listaItems.add(criarGoogle(event));
         }
         return listaItems;
     }
 
-    private Google createGoogleFromEvent(Event event) {
+    private Google criarGoogle(Event event) {
         Google google = new Google();
         google.setSummary(event.getSummary());
         google.setDescription(event.getDescription());
@@ -163,14 +219,13 @@ public class GoogleService {
         List<Google> listaItems = new ArrayList<>();
 
         for (Event event : events.getItems()) {
-            listaItems.add(createGoogleFromEvent(event));
+            listaItems.add(criarGoogle(event));
         }
 
         Google[] vetorEventos = transformarListaParaVetor(listaItems);
         preencherVetorRecursivo(listaItems, vetorEventos, 0);
 
 
-        // Ordenar a lista de eventos pelo summary em ordem alfabética
         mergeSort(0, vetorEventos.length, vetorEventos);
         return vetorEventos;
     }

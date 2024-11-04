@@ -52,9 +52,7 @@ public class OrcamentoMapper {
                 .id(usuario.getId())
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
-                .senha(usuario.getSenha())
                 .telefone(usuario.getTelefone())
-                .foto(usuario.getFoto())
                 .build();
 
         OrcamentoResponseDto.DecoracaoDto decoracaoDto = OrcamentoResponseDto.DecoracaoDto
@@ -76,6 +74,7 @@ public class OrcamentoMapper {
                 .saborBolo(orcamento.getSaborBolo())
                 .pratoPrincipal(orcamento.getPratoPrincipal())
                 .sugestao(orcamento.getSugestao())
+                .googleEventoId(orcamento.getGoogleEventoId())
                 .tipoEvento(tipoEventoDto)
                 .usuario(usuarioDto)
                 .decoracao(decoracaoDto)
