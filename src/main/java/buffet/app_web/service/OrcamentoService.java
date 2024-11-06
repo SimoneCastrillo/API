@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,14 +22,14 @@ import java.util.Optional;
 public class OrcamentoService implements OrcamentoStrategy {
     @Autowired
     private OrcamentoRepository orcamentoRepository;
-
     @Autowired
     private TipoEventoService tipoEventoService;
-
     @Autowired
     private UsuarioService usuarioService;
     @Autowired
     private DecoracaoService decoracaoService;
+    @Autowired
+    private GoogleService googleService;
 
     @Override
     public List<Orcamento> listarTodos() {
@@ -49,12 +51,38 @@ public class OrcamentoService implements OrcamentoStrategy {
         orcamento.setUsuario(usuario);
         orcamento.setDecoracao(decoracao);
 
+        googleService.criarEvento(orcamento);
+        return orcamentoRepository.save(orcamento);
+    }
+
+    public Orcamento atualizar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId) {
+        TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
+        Usuario usuario = usuarioService.buscarPorId(usuarioId);
+        Decoracao decoracao = decoracaoService.buscarPorId(decoracaoId);
+//        Orcamento orcamento1 = buscarPorId(orcamento.getId());
+//        String eventoId = orcamento1.getGoogleEventoId();
+
+        orcamento.setTipoEvento(tipoEvento);
+        orcamento.setUsuario(usuario);
+        orcamento.setDecoracao(decoracao);
+//        orcamento.setGoogleEventoId(eventoId);
+
+        try {
+            googleService.atualizarEvento("primary", orcamento);
+        } catch (IOException | GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
         return orcamentoRepository.save(orcamento);
     }
 
     @Override
     public void deletar(Integer id) {
         Orcamento orcamento = buscarPorId(id);
+        try {
+            googleService.deletarEvento("primary", orcamento);
+        } catch (IOException | GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
         orcamentoRepository.deleteById(orcamento.getId());
     }
 
