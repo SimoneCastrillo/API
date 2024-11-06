@@ -103,4 +103,9 @@ public class OrcamentoService implements OrcamentoStrategy {
     public Integer countByUsuarioId(Integer usuarioId){
         return orcamentoRepository.countByUsuarioId(usuarioId);
     }
+
+    @Override
+    public List<Orcamento> findByUsuarioId(int id) {
+        return orcamentoRepository.findByUsuarioId(id);
+    }
 }

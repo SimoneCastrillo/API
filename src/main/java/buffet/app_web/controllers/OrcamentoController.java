@@ -2,8 +2,10 @@ package buffet.app_web.controllers;
 
 import buffet.app_web.dto.request.orcamento.OrcamentoRequestDto;
 import buffet.app_web.dto.response.orcamento.OrcamentoResponseDto;
+import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
 import buffet.app_web.entities.Orcamento;
 import buffet.app_web.mapper.OrcamentoMapper;
+import buffet.app_web.mapper.UsuarioMapper;
 import buffet.app_web.service.ExportacaoService;
 import buffet.app_web.service.GoogleService;
 import buffet.app_web.strategies.OrcamentoStrategy;
@@ -200,5 +202,17 @@ public class OrcamentoController {
     public ResponseEntity<Orcamento> cancelarEvento(@PathVariable int id){
         orcamentoStrategy.cancelarEvento(id);
         return noContent().build();
+    }
+
+    @GetMapping("/usuario/{id}")
+    public ResponseEntity<List<OrcamentoResponseDto>> listarPorUsuarioId(@PathVariable int id){
+        if (orcamentoStrategy.findByUsuarioId(id).isEmpty()){
+            return noContent().build();
+        }
+
+        List<OrcamentoResponseDto> orcamentos =
+                orcamentoStrategy.findByUsuarioId(id).stream().map(OrcamentoMapper::toResponseDto).toList();
+
+        return ok(orcamentos);
     }
 }
