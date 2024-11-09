@@ -38,7 +38,7 @@ public class Orcamento {
     private Decoracao decoracao;
 
     public void finalizarSeDataPassou() {
-        if (this.status.equals("CONFIRMADO")  && this.dataEvento.isBefore(LocalDate.now())) {
+        if (this.status.equals("CONFIRMADO") && this.dataEvento.isBefore(LocalDate.now())) {
             this.status = "FINALIZADO";
         }
     }

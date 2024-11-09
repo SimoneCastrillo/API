@@ -97,7 +97,7 @@ public class OrcamentoService implements OrcamentoStrategy {
     public Orcamento cancelarEvento(int id, Authentication authentication) {
         Orcamento orcamento = buscarPorId(id);
 
-        if (orcamento.getCancelado() || orcamento.getStatus().equals("FINALIZADO") ){
+        if (orcamento.getCancelado() || orcamento.getStatus().equals("FINALIZADO") || orcamento.getStatus().equals("CONFIRMADO") ){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
