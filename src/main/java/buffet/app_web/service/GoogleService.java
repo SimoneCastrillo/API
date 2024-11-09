@@ -90,7 +90,12 @@ public class GoogleService {
 
         if (eventId != null) {
             Event event = service.events().get(calendarId, eventId).execute();
-            event.setSummary(orcamento.getTipoEvento().getNome());
+
+            if (orcamento.getStatus().equals("FINALIZADO")){
+                event.setSummary(orcamento.getStatus());
+            } else {
+                event.setSummary(orcamento.getTipoEvento().getNome());
+            }
             event.setDescription(buildDescription(orcamento));
 
             ZoneId zoneId = ZoneId.systemDefault();

@@ -37,13 +37,9 @@ public class Orcamento {
     @ManyToOne
     private Decoracao decoracao;
 
-    public String getStatus(){
-        if (this.cancelado){
-            return "CANCELADO";
+    public void finalizarSeDataPassou() {
+        if (this.status.equals("CONFIRMADO")  && this.dataEvento.isBefore(LocalDate.now())) {
+            this.status = "FINALIZADO";
         }
-        if (this.dataEvento.isBefore(LocalDate.now())){
-            return "FINALIZADO";
-        }
-        return "ABERTO";
     }
 }

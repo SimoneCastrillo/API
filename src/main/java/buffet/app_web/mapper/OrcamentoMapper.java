@@ -16,7 +16,7 @@ public class OrcamentoMapper {
                 .builder()
                 .dataEvento(dto.getDataEvento())
                 .qtdConvidados(dto.getQtdConvidados())
-                .status("ABERTO")
+                .status("PENDENTE")
                 .cancelado(false)
                 .inicio(dto.getInicio())
                 .fim(dto.getInicio().plusHours(2))

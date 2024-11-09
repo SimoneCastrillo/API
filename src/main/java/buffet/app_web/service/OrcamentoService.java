@@ -10,11 +10,15 @@ import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,17 +59,20 @@ public class OrcamentoService implements OrcamentoStrategy {
         return orcamentoRepository.save(orcamento);
     }
 
-    public Orcamento atualizar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId) {
+    public Orcamento atualizar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Authentication authentication) {
+        if (orcamento.getStatus().equals("CANCELADO")){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        validarPermissaoOperacao(orcamento, authentication);
+
         TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
         Usuario usuario = usuarioService.buscarPorId(usuarioId);
         Decoracao decoracao = decoracaoService.buscarPorId(decoracaoId);
-//        Orcamento orcamento1 = buscarPorId(orcamento.getId());
-//        String eventoId = orcamento1.getGoogleEventoId();
 
         orcamento.setTipoEvento(tipoEvento);
         orcamento.setUsuario(usuario);
         orcamento.setDecoracao(decoracao);
-//        orcamento.setGoogleEventoId(eventoId);
 
         try {
             googleService.atualizarEvento("primary", orcamento);
@@ -87,17 +94,85 @@ public class OrcamentoService implements OrcamentoStrategy {
     }
 
     @Override
-    public Orcamento cancelarEvento(int id) {
+    public Orcamento cancelarEvento(int id, Authentication authentication) {
         Orcamento orcamento = buscarPorId(id);
 
-        if (orcamento.getCancelado() || orcamento.getStatus().equals("FINALIZADO")){
+        if (orcamento.getCancelado() || orcamento.getStatus().equals("FINALIZADO") ){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        validarPermissaoOperacao(orcamento, authentication);
+
+        try {
+            googleService.deletarEvento("primary", orcamento);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
         }
 
         orcamento.setId(id);
         orcamento.setCancelado(true);
-        orcamento.setStatus(orcamento.getStatus());
+        orcamento.setStatus("CANCELADO");
         return orcamentoRepository.save(orcamento);
+    }
+
+    private void validarPermissaoOperacao(Orcamento orcamento, Authentication authentication) {
+        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        boolean isUsuario = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER"));
+
+        if (isAdmin) {
+            return;
+        }
+
+        if (isUsuario) {
+            long daysUntilEvent = ChronoUnit.DAYS.between(LocalDate.now(), orcamento.getDataEvento());
+            if (daysUntilEvent < 7) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        } else {
+            throw new RuntimeException("Usuário não autorizado para esta operação.");
+        }
+    }
+
+    @Override
+    public Orcamento confirmarEvento(int id) {
+        Orcamento orcamento = buscarPorId(id);
+
+        if (orcamento.getCancelado() || orcamento.getStatus().equals("FINALIZADO") ){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        orcamento.setId(id);
+        orcamento.setStatus("CONFIRMADO");
+
+        try {
+            googleService.atualizarEvento("primary", orcamento);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+
+        return orcamentoRepository.save(orcamento);
+    }
+
+
+    @Override
+    public void finalizarOrcamentosExpirados() {
+        List<Orcamento> orcamentos = orcamentoRepository.findByStatusAndDataEventoBefore("CONFIRMADO", LocalDate.now());
+
+        for (Orcamento orcamento : orcamentos) {
+            orcamento.finalizarSeDataPassou();
+
+            try {
+                googleService.atualizarEvento("primary", orcamento);
+            } catch (IOException | GeneralSecurityException e) {
+                throw new RuntimeException(e);
+            }
+
+            orcamentoRepository.save(orcamento);
+        }
     }
 
     public Integer countByUsuarioId(Integer usuarioId){
@@ -107,5 +182,13 @@ public class OrcamentoService implements OrcamentoStrategy {
     @Override
     public List<Orcamento> findByUsuarioId(int id) {
         return orcamentoRepository.findByUsuarioId(id);
+    }
+
+    public boolean isSevenDaysBeforeEvent(int id) {
+        Orcamento orcamento = buscarPorId(id);
+
+        LocalDate now = LocalDate.now();
+        long daysDifference = ChronoUnit.DAYS.between(now, orcamento.getDataEvento());
+        return daysDifference == 7;
     }
 }
