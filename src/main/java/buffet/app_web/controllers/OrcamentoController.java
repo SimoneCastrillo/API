@@ -20,6 +20,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -144,7 +145,7 @@ public class OrcamentoController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<OrcamentoResponseDto> atualizar(
-            @RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto, @PathVariable int id
+            @RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto, @PathVariable int id, Authentication authentication
     ){
 
         Integer tipoEventoId = orcamentoRequestDto.getTipoEventoId();
@@ -156,8 +157,9 @@ public class OrcamentoController {
         Orcamento orcamento = OrcamentoMapper.toEntity(orcamentoRequestDto);
         orcamento.setId(id);
         orcamento.setGoogleEventoId(orcamentoBusca.getGoogleEventoId());
+        orcamento.setStatus(orcamentoBusca.getStatus());
 
-        Orcamento orcamentoSalvo = orcamentoStrategy.atualizar(orcamento, tipoEventoId, usuarioId, decoracaoId);
+        Orcamento orcamentoSalvo = orcamentoStrategy.atualizar(orcamento, tipoEventoId, usuarioId, decoracaoId, authentication);
 
         OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamentoSalvo);
 
@@ -199,10 +201,25 @@ public class OrcamentoController {
             )
     })
     @PatchMapping("/{id}/cancelamento")
-    public ResponseEntity<Orcamento> cancelarEvento(@PathVariable int id){
-        orcamentoStrategy.cancelarEvento(id);
+    public ResponseEntity<Void> cancelarEvento(@PathVariable int id, Authentication authentication){
+        orcamentoStrategy.cancelarEvento(id, authentication);
         return noContent().build();
     }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PatchMapping("/{id}/confirmar")
+    public ResponseEntity<Void> confirmarEvento(@PathVariable int id){
+        orcamentoStrategy.confirmarEvento(id);
+        return noContent().build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PatchMapping("/atualizar-status-expirados")
+    public ResponseEntity<Void> atualizarStatusOrcamentosExpirados() {
+        orcamentoStrategy.finalizarOrcamentosExpirados();
+        return ResponseEntity.noContent().build();
+    }
+
 
     @GetMapping("/usuario/{id}")
     public ResponseEntity<List<OrcamentoResponseDto>> listarPorUsuarioId(@PathVariable int id){
@@ -215,4 +232,6 @@ public class OrcamentoController {
 
         return ok(orcamentos);
     }
+
+
 }
