@@ -1,5 +1,6 @@
 package buffet.app_web.mapper;
 
+import buffet.app_web.dto.request.orcamento.OrcamentoConfirmacaoDto;
 import buffet.app_web.dto.request.orcamento.OrcamentoRequestDto;
 import buffet.app_web.dto.response.decoracao.DecoracaoResponseDto;
 import buffet.app_web.dto.response.orcamento.OrcamentoResponseDto;
@@ -20,26 +21,47 @@ public class OrcamentoMapper {
                 .cancelado(false)
                 .inicio(dto.getInicio())
                 .fim(dto.getInicio().plusHours(2))
-                .saborBolo(dto.getSaborBolo())
-                .pratoPrincipal(dto.getPratoPrincipal())
                 .sugestao(dto.getSugestao())
                 .build();
 
         return orcamento;
     }
 
-    public static OrcamentoResponseDto toResponseDto(Orcamento orcamento){
-        if(orcamento == null) return null;
+    public static Orcamento toEntity(OrcamentoConfirmacaoDto dto){
+        if (dto == null) return null;
+
+        Orcamento orcamento = Orcamento
+                .builder()
+                .dataEvento(dto.getDataEvento())
+                .qtdConvidados(dto.getQtdConvidados())
+                .inicio(dto.getInicio())
+                .fim(dto.getFim())
+                .saborBolo(dto.getSaborBolo())
+                .pratoPrincipal(dto.getPratoPrincipal())
+                .lucro(dto.getFaturamento() - dto.getDespesa())
+                .faturamento(dto.getFaturamento())
+                .despesa(dto.getDespesa())
+                .sugestao(dto.getSugestao())
+                .build();
+
+        return orcamento;
+    }
+
+    public static OrcamentoResponseDto toResponseDto(Orcamento orcamento) {
+        if (orcamento == null) return null;
 
         TipoEvento tipoEvento = orcamento.getTipoEvento();
         Usuario usuario = orcamento.getUsuario();
         Decoracao decoracao = orcamento.getDecoracao();
 
-        DecoracaoResponseDto.TipoEventoDto tipoEventoDecoracaoDto = DecoracaoResponseDto.TipoEventoDto
-                .builder()
-                .id(decoracao.getTipoEvento().getId())
-                .nome(decoracao.getTipoEvento().getNome())
-                .build();
+        DecoracaoResponseDto.TipoEventoDto tipoEventoDecoracaoDto = null;
+        if (decoracao != null) {
+            tipoEventoDecoracaoDto = DecoracaoResponseDto.TipoEventoDto
+                    .builder()
+                    .id(decoracao.getTipoEvento().getId())
+                    .nome(decoracao.getTipoEvento().getNome())
+                    .build();
+        }
 
         OrcamentoResponseDto.TipoEventoDto tipoEventoDto = OrcamentoResponseDto.TipoEventoDto
                 .builder()
@@ -55,12 +77,15 @@ public class OrcamentoMapper {
                 .telefone(usuario.getTelefone())
                 .build();
 
-        OrcamentoResponseDto.DecoracaoDto decoracaoDto = OrcamentoResponseDto.DecoracaoDto
-                .builder()
-                .id(decoracao.getId())
-                .nome(decoracao.getNome())
-                .tipoEvento(tipoEventoDecoracaoDto)
-                .build();
+        OrcamentoResponseDto.DecoracaoDto decoracaoDto = null;
+        if (decoracao != null) {
+            decoracaoDto = OrcamentoResponseDto.DecoracaoDto
+                    .builder()
+                    .id(decoracao.getId())
+                    .nome(decoracao.getNome())
+                    .tipoEvento(tipoEventoDecoracaoDto)
+                    .build();
+        }
 
         OrcamentoResponseDto dto = OrcamentoResponseDto
                 .builder()
@@ -73,6 +98,9 @@ public class OrcamentoMapper {
                 .fim(orcamento.getFim())
                 .saborBolo(orcamento.getSaborBolo())
                 .pratoPrincipal(orcamento.getPratoPrincipal())
+                .lucro(orcamento.getLucro())
+                .faturamento(orcamento.getFaturamento())
+                .despesa(orcamento.getDespesa())
                 .sugestao(orcamento.getSugestao())
                 .googleEventoId(orcamento.getGoogleEventoId())
                 .tipoEvento(tipoEventoDto)
@@ -82,4 +110,5 @@ public class OrcamentoMapper {
 
         return dto;
     }
+
 }
