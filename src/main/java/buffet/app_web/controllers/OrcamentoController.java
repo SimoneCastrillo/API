@@ -1,5 +1,6 @@
 package buffet.app_web.controllers;
 
+import buffet.app_web.dto.request.orcamento.OrcamentoConfirmacaoDto;
 import buffet.app_web.dto.request.orcamento.OrcamentoRequestDto;
 import buffet.app_web.dto.response.orcamento.OrcamentoResponseDto;
 import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
@@ -92,7 +93,6 @@ public class OrcamentoController {
                     content = @Content()
             )
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<OrcamentoResponseDto> buscarPorId(@PathVariable int id){
         return status(200).body(OrcamentoMapper.toResponseDto(orcamentoStrategy.buscarPorId(id)));
@@ -113,15 +113,15 @@ public class OrcamentoController {
     })
     @PostMapping
     public ResponseEntity<OrcamentoResponseDto> criar(
-            @RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto
+            @RequestBody @Valid OrcamentoRequestDto orcamentoConfirmacaoDto
     ){
 
-        Integer tipoEventoId = orcamentoRequestDto.getTipoEventoId();
-        Integer usuarioId = orcamentoRequestDto.getUsuarioId();
-        Integer decoracaoId = orcamentoRequestDto.getDecoracaoId();
+        Integer tipoEventoId = orcamentoConfirmacaoDto.getTipoEventoId();
+        Integer usuarioId = orcamentoConfirmacaoDto.getUsuarioId();
+        Integer decoracaoId = orcamentoConfirmacaoDto.getDecoracaoId();
 
         Orcamento orcamento = orcamentoStrategy.salvar(
-                OrcamentoMapper.toEntity(orcamentoRequestDto), tipoEventoId, usuarioId, decoracaoId);
+                OrcamentoMapper.toEntity(orcamentoConfirmacaoDto), tipoEventoId, usuarioId, decoracaoId);
         OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamento);
 
         return created(null).body(responseDto);
@@ -145,21 +145,46 @@ public class OrcamentoController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<OrcamentoResponseDto> atualizar(
-            @RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto, @PathVariable int id, Authentication authentication
+            @RequestBody @Valid OrcamentoRequestDto orcamentoConfirmacaoDto, @PathVariable int id, Authentication authentication
     ){
 
-        Integer tipoEventoId = orcamentoRequestDto.getTipoEventoId();
-        Integer usuarioId = orcamentoRequestDto.getUsuarioId();
-        Integer decoracaoId = orcamentoRequestDto.getDecoracaoId();
+        Integer tipoEventoId = orcamentoConfirmacaoDto.getTipoEventoId();
+        Integer usuarioId = orcamentoConfirmacaoDto.getUsuarioId();
+        Integer decoracaoId = orcamentoConfirmacaoDto.getDecoracaoId();
 
         Orcamento orcamentoBusca = orcamentoStrategy.buscarPorId(id);
 
-        Orcamento orcamento = OrcamentoMapper.toEntity(orcamentoRequestDto);
+        Orcamento orcamento = OrcamentoMapper.toEntity(orcamentoConfirmacaoDto);
         orcamento.setId(id);
         orcamento.setGoogleEventoId(orcamentoBusca.getGoogleEventoId());
         orcamento.setStatus(orcamentoBusca.getStatus());
 
         Orcamento orcamentoSalvo = orcamentoStrategy.atualizar(orcamento, tipoEventoId, usuarioId, decoracaoId, authentication);
+
+        OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamentoSalvo);
+
+        return ok(responseDto);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/{id}/confirmar-dados")
+    public ResponseEntity<OrcamentoResponseDto> confirmarDadosDoEvento(
+            @RequestBody @Valid OrcamentoConfirmacaoDto orcamentoConfirmacaoDto, @PathVariable int id
+    ){
+
+        Integer tipoEventoId = orcamentoConfirmacaoDto.getTipoEventoId();
+        Integer decoracaoId = orcamentoConfirmacaoDto.getDecoracaoId();
+
+        Orcamento orcamentoBusca = orcamentoStrategy.buscarPorId(id);
+
+        Orcamento orcamento = OrcamentoMapper.toEntity(orcamentoConfirmacaoDto);
+        orcamento.setId(id);
+        orcamento.setGoogleEventoId(orcamentoBusca.getGoogleEventoId());
+        orcamento.setStatus(orcamentoBusca.getStatus());
+        orcamento.setCancelado(orcamentoBusca.getCancelado()    );
+        orcamento.setUsuario(orcamentoBusca.getUsuario());
+
+        Orcamento orcamentoSalvo = orcamentoStrategy.confirmarDadosDoEvento(orcamento, tipoEventoId, decoracaoId);
 
         OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamentoSalvo);
 

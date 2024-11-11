@@ -47,9 +47,13 @@ public class OrcamentoService implements OrcamentoStrategy {
 
     @Override
     public Orcamento salvar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId) {
+        Decoracao decoracao = null;
+        if (decoracaoId != null) {
+            decoracao = decoracaoService.buscarPorId(decoracaoId);
+        }
+
         TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
         Usuario usuario = usuarioService.buscarPorId(usuarioId);
-        Decoracao decoracao = decoracaoService.buscarPorId(decoracaoId);
 
         orcamento.setTipoEvento(tipoEvento);
         orcamento.setUsuario(usuario);
@@ -64,11 +68,15 @@ public class OrcamentoService implements OrcamentoStrategy {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
+        Decoracao decoracao = null;
+        if (decoracaoId != null) {
+            decoracao = decoracaoService.buscarPorId(decoracaoId);
+        }
+
         validarPermissaoOperacao(orcamento, authentication);
 
         TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
         Usuario usuario = usuarioService.buscarPorId(usuarioId);
-        Decoracao decoracao = decoracaoService.buscarPorId(decoracaoId);
 
         orcamento.setTipoEvento(tipoEvento);
         orcamento.setUsuario(usuario);
@@ -155,6 +163,31 @@ public class OrcamentoService implements OrcamentoStrategy {
         }
 
         return orcamentoRepository.save(orcamento);
+    }
+
+    @Override
+    public Orcamento confirmarDadosDoEvento(Orcamento orcamento, Integer tipoEventoId, Integer decoracaoId){
+        if (orcamento.getStatus().equals("CANCELADO")){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        Decoracao decoracao = null;
+        if (decoracaoId != null) {
+            decoracao = decoracaoService.buscarPorId(decoracaoId);
+        }
+
+        TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
+
+        orcamento.setTipoEvento(tipoEvento);
+        orcamento.setDecoracao(decoracao);
+
+        try {
+            googleService.atualizarEvento("primary", orcamento);
+        } catch (IOException | GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+        return orcamentoRepository.save(orcamento);
+
     }
 
 
