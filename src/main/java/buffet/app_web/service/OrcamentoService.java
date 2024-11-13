@@ -1,5 +1,6 @@
 package buffet.app_web.service;
 
+import buffet.app_web.dto.response.tipoevento.TipoEventoContagemDto;
 import buffet.app_web.entities.Decoracao;
 import buffet.app_web.entities.Orcamento;
 import buffet.app_web.entities.TipoEvento;
@@ -223,5 +224,9 @@ public class OrcamentoService implements OrcamentoStrategy {
         LocalDate now = LocalDate.now();
         long daysDifference = ChronoUnit.DAYS.between(now, orcamento.getDataEvento());
         return daysDifference == 7;
+    }
+
+    public List<TipoEventoContagemDto> countOrcamentosByTipoEvento() {
+        return orcamentoRepository.countOrcamentosByTipoEvento();
     }
 }
