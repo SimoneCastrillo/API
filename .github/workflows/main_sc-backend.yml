@@ -1,3 +1,5 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
 name: Build and deploy JAR app to Azure Web App - sc-backend
 
 on:
@@ -9,19 +11,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Java version
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'microsoft'
-
       - name: Build with Maven (Skip Tests)
-        run: mvn clean install -DskipTests
-
+        run: mvn clean install -DskipTests  # Skips tests during build
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -46,10 +44,10 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.__clientidsecretname__ }}
-          tenant-id: ${{ secrets.__tenantidsecretname__ }}
-          subscription-id: ${{ secrets.__subscriptionidsecretname__ }}
-
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_1F87BA101BF240A6A4B1E706C4CDBC04 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_05863A2CE2294638BB472C1473986F6D }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_57A5BC28D41043AA8E2919954C4C0906 }}
+      
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
