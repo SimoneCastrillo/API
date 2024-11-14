@@ -22,8 +22,8 @@ jobs:
           java-version: '17'
           distribution: 'microsoft'
 
-      - name: Build with Maven (skip tests)
-        run: mvn clean install -DskipTests  # Ignora a execução dos testes durante o build
+      - name: Build with Maven
+        run: mvn clean install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -37,22 +37,13 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write # This is required for requesting the JWT
-  
+      
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: java-app
       
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_63536E0B194743D8825A045E2476A188 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_CD1FD7EA6B1D4A4784695ACAFD950A72 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_526F596683814FC6A7FB9AAB2AFA40A2 }}
-
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -60,3 +51,4 @@ jobs:
           app-name: 'simone-backend'
           slot-name: 'Production'
           package: '*.jar'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FA6E0F64E8044D13816FA7E663CB25C4 }}
