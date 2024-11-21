@@ -1,11 +1,10 @@
 package buffet.app_web.strategies;
 
-import buffet.app_web.dto.response.tipoevento.TipoEventoContagemDto;
+import buffet.app_web.dto.response.dashboard.TipoEventoContagemDto;
 import buffet.app_web.entities.Orcamento;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface OrcamentoStrategy {
     List<Orcamento> listarTodos();
@@ -18,5 +17,4 @@ public interface OrcamentoStrategy {
     Orcamento confirmarDadosDoEvento(Orcamento orcamento, Integer tipoEventoId, Integer decoracaoId);
     List<Orcamento> findByUsuarioId(int id);
     void finalizarOrcamentosExpirados();
-    List<TipoEventoContagemDto> countOrcamentosByTipoEvento();
 }

@@ -1,4 +1,4 @@
-package buffet.app_web.dto.response.tipoevento;
+package buffet.app_web.dto.response.dashboard;
 
 import lombok.Builder;
 import lombok.Data;
