@@ -1,16 +1,14 @@
 package buffet.app_web.service;
 
-import buffet.app_web.dto.response.tipoevento.TipoEventoContagemDto;
+import buffet.app_web.dto.response.dashboard.TipoEventoContagemDto;
 import buffet.app_web.entities.Decoracao;
 import buffet.app_web.entities.Orcamento;
 import buffet.app_web.entities.TipoEvento;
 import buffet.app_web.entities.Usuario;
 import buffet.app_web.repositories.OrcamentoRepository;
 import buffet.app_web.strategies.OrcamentoStrategy;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -21,7 +19,6 @@ import java.security.GeneralSecurityException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrcamentoService implements OrcamentoStrategy {
