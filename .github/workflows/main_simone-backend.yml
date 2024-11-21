@@ -1,4 +1,7 @@
-name: Build and deploy JAR app to Azure Web App - sc-backend
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy JAR app to Azure Web App - simone-backend
 
 on:
   push:
@@ -19,8 +22,8 @@ jobs:
           java-version: '17'
           distribution: 'microsoft'
 
-      - name: Build with Maven (Skip tests)
-        run: mvn clean install -DskipTests
+      - name: Build with Maven
+        run: mvn clean install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -34,26 +37,18 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write # This is required for requesting the JWT
-  
+      
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: java-app
       
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9CD037BF53D144D182BB3B94BDCA0230 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_58343F0FD4DF49388447E465CED788DE }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B78856C815A947CABC8B37C05237D94E }}
-
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'sc-backend'
+          app-name: 'simone-backend'
           slot-name: 'Production'
           package: '*.jar'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_14C01ADB2266453981DF05CBB8781103 }}
