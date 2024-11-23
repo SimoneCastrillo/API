@@ -232,6 +232,13 @@ public class OrcamentoController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PatchMapping("/{id}/desfazer-cancelamento")
+    public ResponseEntity<Void> desfazerCancelamento(@PathVariable int id) {
+        orcamentoStrategy.desfazerCancelamento(id);
+        return noContent().build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PatchMapping("/{id}/confirmar")
     public ResponseEntity<Void> confirmarEvento(@PathVariable int id){
         orcamentoStrategy.confirmarEvento(id);
