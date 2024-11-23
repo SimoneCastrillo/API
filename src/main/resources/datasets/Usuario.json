@@ -1,0 +1,9 @@
+{
+  "id": 2,
+  "nome": "Eduardo",
+  "email": "eduardo@gmail.com",
+  "senha": "123456",
+  "telefone": "40028922",
+  "role": "USUARIO",
+  "foto": null
+}
