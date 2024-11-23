@@ -99,4 +99,28 @@ public class DashboardController {
         return ResponseEntity.ok(resultado);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/lucro-por-tipo-evento")
+    public ResponseEntity<List<LucroPorTipoEventoDto>> getLucroPorTipoEvento() {
+        List<LucroPorTipoEventoDto> lucros = dashboardStrategy.obterLucroPorTipoEvento();
+        return ResponseEntity.ok(lucros);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/quantidade-por-mes")
+    public ResponseEntity<List<QuantidadeOrcamentosPorMesDto>> getQuantidadeOrcamentosPorMes() {
+        List<QuantidadeOrcamentosPorMesDto> resultado = dashboardStrategy.obterQuantidadeOrcamentosPorMes();
+        return ResponseEntity.ok(resultado);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/faturamento-despesa-por-mes")
+    public ResponseEntity<List<FaturamentoDespesaMesDto>> getFaturamentoEDespesaPorMes() {
+        List<FaturamentoDespesaMesDto> resultado = dashboardStrategy.getFaturamentoEDespesaPorMes();
+        if (resultado.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(resultado);
+    }
+
 }

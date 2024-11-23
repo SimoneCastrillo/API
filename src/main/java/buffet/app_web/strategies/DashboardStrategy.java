@@ -13,5 +13,8 @@ public interface DashboardStrategy {
     Double getFaturamentoMedioPorEvento();
     List<FaturamentoDespesaTipoEventoDto> getFaturamentoEDespesaPorTipoEvento();
     List<PopularidadeDecoracaoDto> getPopularidadeDecoracao();
+    List<LucroPorTipoEventoDto> obterLucroPorTipoEvento();
+    List<QuantidadeOrcamentosPorMesDto> obterQuantidadeOrcamentosPorMes();
+    List<FaturamentoDespesaMesDto> getFaturamentoEDespesaPorMes();
 
 }
