@@ -90,7 +90,12 @@ public class GoogleService {
 
         if (eventId != null) {
             Event event = service.events().get(calendarId, eventId).execute();
-            event.setSummary(orcamento.getTipoEvento().getNome());
+
+            if (orcamento.getStatus().equals("FINALIZADO")){
+                event.setSummary(orcamento.getStatus());
+            } else {
+                event.setSummary(orcamento.getTipoEvento().getNome());
+            }
             event.setDescription(buildDescription(orcamento));
 
             ZoneId zoneId = ZoneId.systemDefault();
@@ -148,12 +153,35 @@ public class GoogleService {
     }
 
     private String buildDescription(Orcamento orcamento) {
+       if (orcamento.getDecoracao() == null){
+           return String.format("Orçamento de: %s\n" +
+                           "Telefone: %s\n" +
+                           "Dados do Orçamento:\n" +
+                           "- Número de Convidados: %d\n" +
+                           "- Tipo de Evento: %s\n" +
+                           "- Status: %s\n" +
+                           "- Decoracao: %s\n" +
+                           "- Sabor do bolo: %s\n" +
+                           "- Prato principal: %s\n" +
+                           "- Sugestão: %s",
+                   orcamento.getUsuario().getNome(),
+                   orcamento.getUsuario().getTelefone(),
+                   orcamento.getQtdConvidados(),
+                   orcamento.getTipoEvento().getNome(),
+                   orcamento.getStatus(),
+                   "Sem decoração",
+                   orcamento.getSaborBolo(),
+                   orcamento.getPratoPrincipal(),
+                   orcamento.getSugestao());
+       }
+
         return String.format("Orçamento de: %s\n" +
                         "Telefone: %s\n" +
                         "Dados do Orçamento:\n" +
                         "- Número de Convidados: %d\n" +
                         "- Tipo de Evento: %s\n" +
                         "- Status: %s\n" +
+                        "- Decoracao: %s\n" +
                         "- Sabor do bolo: %s\n" +
                         "- Prato principal: %s\n" +
                         "- Sugestão: %s",
@@ -162,6 +190,7 @@ public class GoogleService {
                 orcamento.getQtdConvidados(),
                 orcamento.getTipoEvento().getNome(),
                 orcamento.getStatus(),
+                orcamento.getDecoracao().getNome(),
                 orcamento.getSaborBolo(),
                 orcamento.getPratoPrincipal(),
                 orcamento.getSugestao());

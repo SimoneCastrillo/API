@@ -5,6 +5,7 @@ import buffet.app_web.dto.request.usuario.UsuarioUpdateDto;
 import buffet.app_web.dto.response.usuario.UsuarioPorIdResponseDto;
 import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
 import buffet.app_web.entities.Usuario;
+import buffet.app_web.enums.UserRole;
 import buffet.app_web.mapper.UsuarioMapper;
 import buffet.app_web.repositories.UsuarioRepository;
 import buffet.app_web.service.OrcamentoService;
@@ -139,10 +140,13 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponseDto> atualizar(@PathVariable int id, @ModelAttribute @Valid UsuarioUpdateDto usuarioUpdateDto){
         usuarioStrategy.buscarPorId(id);
         String senha = usuarioStrategy.buscarPorId(id).getSenha();
+        UserRole userRole = usuarioStrategy.buscarPorId(id).getRole();
 
         Usuario usuario = UsuarioMapper.toEntity(usuarioUpdateDto);
         usuario.setId(id);
         usuario.setSenha(senha);
+        usuario.setRole(userRole);
+
         Usuario usuarioSalvo = usuarioStrategy.atualizar(usuario);
         UsuarioResponseDto usuarioResponseDto = UsuarioMapper.toResponseDto(usuarioSalvo);
 

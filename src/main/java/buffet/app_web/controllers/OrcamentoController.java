@@ -1,9 +1,12 @@
 package buffet.app_web.controllers;
 
+import buffet.app_web.dto.request.orcamento.OrcamentoConfirmacaoDto;
 import buffet.app_web.dto.request.orcamento.OrcamentoRequestDto;
 import buffet.app_web.dto.response.orcamento.OrcamentoResponseDto;
+import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
 import buffet.app_web.entities.Orcamento;
 import buffet.app_web.mapper.OrcamentoMapper;
+import buffet.app_web.mapper.UsuarioMapper;
 import buffet.app_web.service.ExportacaoService;
 import buffet.app_web.service.GoogleService;
 import buffet.app_web.strategies.OrcamentoStrategy;
@@ -18,6 +21,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -89,7 +93,6 @@ public class OrcamentoController {
                     content = @Content()
             )
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<OrcamentoResponseDto> buscarPorId(@PathVariable int id){
         return status(200).body(OrcamentoMapper.toResponseDto(orcamentoStrategy.buscarPorId(id)));
@@ -110,15 +113,15 @@ public class OrcamentoController {
     })
     @PostMapping
     public ResponseEntity<OrcamentoResponseDto> criar(
-            @RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto
+            @RequestBody @Valid OrcamentoRequestDto orcamentoConfirmacaoDto
     ){
 
-        Integer tipoEventoId = orcamentoRequestDto.getTipoEventoId();
-        Integer usuarioId = orcamentoRequestDto.getUsuarioId();
-        Integer decoracaoId = orcamentoRequestDto.getDecoracaoId();
+        Integer tipoEventoId = orcamentoConfirmacaoDto.getTipoEventoId();
+        Integer usuarioId = orcamentoConfirmacaoDto.getUsuarioId();
+        Integer decoracaoId = orcamentoConfirmacaoDto.getDecoracaoId();
 
         Orcamento orcamento = orcamentoStrategy.salvar(
-                OrcamentoMapper.toEntity(orcamentoRequestDto), tipoEventoId, usuarioId, decoracaoId);
+                OrcamentoMapper.toEntity(orcamentoConfirmacaoDto), tipoEventoId, usuarioId, decoracaoId);
         OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamento);
 
         return created(null).body(responseDto);
@@ -142,20 +145,46 @@ public class OrcamentoController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<OrcamentoResponseDto> atualizar(
-            @RequestBody @Valid OrcamentoRequestDto orcamentoRequestDto, @PathVariable int id
+            @RequestBody @Valid OrcamentoRequestDto orcamentoConfirmacaoDto, @PathVariable int id, Authentication authentication
     ){
 
-        Integer tipoEventoId = orcamentoRequestDto.getTipoEventoId();
-        Integer usuarioId = orcamentoRequestDto.getUsuarioId();
-        Integer decoracaoId = orcamentoRequestDto.getDecoracaoId();
+        Integer tipoEventoId = orcamentoConfirmacaoDto.getTipoEventoId();
+        Integer usuarioId = orcamentoConfirmacaoDto.getUsuarioId();
+        Integer decoracaoId = orcamentoConfirmacaoDto.getDecoracaoId();
 
         Orcamento orcamentoBusca = orcamentoStrategy.buscarPorId(id);
 
-        Orcamento orcamento = OrcamentoMapper.toEntity(orcamentoRequestDto);
+        Orcamento orcamento = OrcamentoMapper.toEntity(orcamentoConfirmacaoDto);
         orcamento.setId(id);
         orcamento.setGoogleEventoId(orcamentoBusca.getGoogleEventoId());
+        orcamento.setStatus(orcamentoBusca.getStatus());
 
-        Orcamento orcamentoSalvo = orcamentoStrategy.atualizar(orcamento, tipoEventoId, usuarioId, decoracaoId);
+        Orcamento orcamentoSalvo = orcamentoStrategy.atualizar(orcamento, tipoEventoId, usuarioId, decoracaoId, authentication);
+
+        OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamentoSalvo);
+
+        return ok(responseDto);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/{id}/confirmar-dados")
+    public ResponseEntity<OrcamentoResponseDto> confirmarDadosDoEvento(
+            @RequestBody @Valid OrcamentoConfirmacaoDto orcamentoConfirmacaoDto, @PathVariable int id
+    ){
+
+        Integer tipoEventoId = orcamentoConfirmacaoDto.getTipoEventoId();
+        Integer decoracaoId = orcamentoConfirmacaoDto.getDecoracaoId();
+
+        Orcamento orcamentoBusca = orcamentoStrategy.buscarPorId(id);
+
+        Orcamento orcamento = OrcamentoMapper.toEntity(orcamentoConfirmacaoDto);
+        orcamento.setId(id);
+        orcamento.setGoogleEventoId(orcamentoBusca.getGoogleEventoId());
+        orcamento.setStatus(orcamentoBusca.getStatus());
+        orcamento.setCancelado(orcamentoBusca.getCancelado()    );
+        orcamento.setUsuario(orcamentoBusca.getUsuario());
+
+        Orcamento orcamentoSalvo = orcamentoStrategy.confirmarDadosDoEvento(orcamento, tipoEventoId, decoracaoId);
 
         OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamentoSalvo);
 
@@ -197,8 +226,37 @@ public class OrcamentoController {
             )
     })
     @PatchMapping("/{id}/cancelamento")
-    public ResponseEntity<Orcamento> cancelarEvento(@PathVariable int id){
-        orcamentoStrategy.cancelarEvento(id);
+    public ResponseEntity<Void> cancelarEvento(@PathVariable int id, Authentication authentication){
+        orcamentoStrategy.cancelarEvento(id, authentication);
         return noContent().build();
     }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PatchMapping("/{id}/confirmar")
+    public ResponseEntity<Void> confirmarEvento(@PathVariable int id){
+        orcamentoStrategy.confirmarEvento(id);
+        return noContent().build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PatchMapping("/atualizar-status-expirados")
+    public ResponseEntity<Void> atualizarStatusOrcamentosExpirados() {
+        orcamentoStrategy.finalizarOrcamentosExpirados();
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/usuario/{id}")
+    public ResponseEntity<List<OrcamentoResponseDto>> listarPorUsuarioId(@PathVariable int id){
+        if (orcamentoStrategy.findByUsuarioId(id).isEmpty()){
+            return noContent().build();
+        }
+
+        List<OrcamentoResponseDto> orcamentos =
+                orcamentoStrategy.findByUsuarioId(id).stream().map(OrcamentoMapper::toResponseDto).toList();
+
+        return ok(orcamentos);
+    }
+
+
 }
