@@ -7,6 +7,8 @@ import buffet.app_web.entities.TipoEvento;
 import buffet.app_web.entities.Usuario;
 import buffet.app_web.repositories.OrcamentoRepository;
 import buffet.app_web.strategies.OrcamentoStrategy;
+import buffet.app_web.util.FilaObj;
+import buffet.app_web.util.PilhaObj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -32,6 +34,9 @@ public class OrcamentoService implements OrcamentoStrategy {
     private DecoracaoService decoracaoService;
     @Autowired
     private GoogleService googleService;
+
+    private PilhaObj<Orcamento> pilhaDesfazerCancelamento = new PilhaObj<>(20);
+    private FilaObj<Orcamento> filaConfirmar = new FilaObj<>(50);
 
     @Override
     public List<Orcamento> listarTodos() {
@@ -103,11 +108,13 @@ public class OrcamentoService implements OrcamentoStrategy {
     public Orcamento cancelarEvento(int id, Authentication authentication) {
         Orcamento orcamento = buscarPorId(id);
 
-        if (orcamento.getCancelado() || orcamento.getStatus().equals("FINALIZADO") || orcamento.getStatus().equals("CONFIRMADO") ){
+        if (orcamento.getCancelado() || orcamento.getStatus().equals("FINALIZADO")){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         validarPermissaoOperacao(orcamento, authentication);
+
+        pilhaDesfazerCancelamento.push(clonarOrcamento(orcamento));
 
         try {
             googleService.deletarEvento("primary", orcamento);
@@ -160,6 +167,8 @@ public class OrcamentoService implements OrcamentoStrategy {
             throw new RuntimeException(e);
         }
 
+        filaConfirmar.insert(orcamento);
+
         return orcamentoRepository.save(orcamento);
     }
 
@@ -188,18 +197,26 @@ public class OrcamentoService implements OrcamentoStrategy {
 
     }
 
-
     @Override
     public void finalizarOrcamentosExpirados() {
         List<Orcamento> orcamentos = orcamentoRepository.findByStatusAndDataEventoBefore("CONFIRMADO", LocalDate.now());
 
         for (Orcamento orcamento : orcamentos) {
+            if (!filaConfirmar.isEmpty() && !filaConfirmar.peek().equals(orcamento)) {
+                filaConfirmar.insert(orcamento);
+            }
+        }
+
+        while (!filaConfirmar.isEmpty()) {
+            Orcamento orcamento = filaConfirmar.poll();
+
             orcamento.finalizarSeDataPassou();
 
             try {
                 googleService.atualizarEvento("primary", orcamento);
             } catch (IOException | GeneralSecurityException e) {
-                throw new RuntimeException(e);
+                System.err.println("Erro ao atualizar evento no Google Calendar para o orçamento ID: " + orcamento.getId());
+                continue;
             }
 
             orcamentoRepository.save(orcamento);
@@ -225,5 +242,43 @@ public class OrcamentoService implements OrcamentoStrategy {
 
     public List<TipoEventoContagemDto> countOrcamentosByTipoEvento() {
         return orcamentoRepository.countOrcamentosByTipoEvento();
+    }
+
+    private Orcamento clonarOrcamento(Orcamento orcamento) {
+        Orcamento clone = new Orcamento();
+        clone.setId(orcamento.getId());
+        clone.setDataEvento(orcamento.getDataEvento());
+        clone.setQtdConvidados(orcamento.getQtdConvidados());
+        clone.setStatus(orcamento.getStatus());
+        clone.setCancelado(orcamento.getCancelado());
+        clone.setInicio(orcamento.getInicio());
+        clone.setFim(orcamento.getFim());
+        clone.setSaborBolo(orcamento.getSaborBolo());
+        clone.setPratoPrincipal(orcamento.getPratoPrincipal());
+        clone.setLucro(orcamento.getLucro());
+        clone.setFaturamento(orcamento.getFaturamento());
+        clone.setDespesa(orcamento.getDespesa());
+        clone.setSugestao(orcamento.getSugestao());
+        clone.setGoogleEventoId(orcamento.getGoogleEventoId());
+        clone.setTipoEvento(orcamento.getTipoEvento());
+        clone.setUsuario(orcamento.getUsuario());
+        clone.setDecoracao(orcamento.getDecoracao());
+        return clone;
+    }
+
+    public Orcamento desfazerCancelamento(int id) {
+        if (pilhaDesfazerCancelamento.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não há operação de cancelamento para desfazer.");
+        }
+
+        Orcamento orcamentoAnterior = pilhaDesfazerCancelamento.pop();
+        String statusOriginal = orcamentoAnterior.getStatus();
+
+        orcamentoAnterior.setStatus(statusOriginal); // Restoring the original status
+        orcamentoAnterior.setCancelado(false);
+
+        googleService.criarEvento(orcamentoAnterior);
+
+        return orcamentoRepository.save(orcamentoAnterior);
     }
 }

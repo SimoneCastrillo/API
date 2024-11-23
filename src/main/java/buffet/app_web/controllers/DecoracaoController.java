@@ -121,8 +121,8 @@ public class DecoracaoController {
             )
     })
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PutMapping("/{id}")
-    public ResponseEntity<DecoracaoResponseDto> atualizar(@RequestBody @Valid DecoracaoRequestDto decoracaoRequestDto, @PathVariable int id, Integer tipoEventoId){
+    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DecoracaoResponseDto> atualizar(@ModelAttribute @Valid DecoracaoRequestDto decoracaoRequestDto, @PathVariable int id, Integer tipoEventoId){
         decoracaoStrategy.buscarPorId(id);
 
         Decoracao decoracao = DecoracaoMapper.toEntity(decoracaoRequestDto);
