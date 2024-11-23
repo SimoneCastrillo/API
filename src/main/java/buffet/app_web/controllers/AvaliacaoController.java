@@ -120,8 +120,8 @@ public class AvaliacaoController {
             ),
     })
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PutMapping("/{id}")
-    public ResponseEntity<AvaliacaoResponseDto> atualizar(@RequestBody @Valid AvaliacaoRequestDto avaliacaoRequestDto, @PathVariable int id){
+    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AvaliacaoResponseDto> atualizar(@ModelAttribute @Valid AvaliacaoRequestDto avaliacaoRequestDto, @PathVariable int id){
         avaliacaoStrategy.buscarPorId(id);
 
         Avaliacao avaliacao = AvaliacaoMapper.toEntity(avaliacaoRequestDto);
