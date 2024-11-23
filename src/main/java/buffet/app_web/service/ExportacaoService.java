@@ -14,9 +14,11 @@ public class ExportacaoService {
     @Autowired
     private OrcamentoService orcamentoService;
 
+    private static final String CSV_FILE_PATH = "orcamentos.csv";
+
     public void exportarOrcamento(){
         try {
-            OutputStream outputStream = new FileOutputStream("orcamentos.csv");
+            OutputStream outputStream = new FileOutputStream(CSV_FILE_PATH);
 
             BufferedWriter escritor = new BufferedWriter(
                     new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)
@@ -31,15 +33,15 @@ public class ExportacaoService {
                     "inicio",
                     "fim",
                     "sugestao",
-                    "fkTipoEvento",
-                    "fkUsuario",
-                    "fkDecoracao"));
+                    "tipoEvento",
+                    "telefoneCliente",
+                    "nomeCliente"));
 
             List<OrcamentoResponseDto> list =
                     orcamentoService.listarTodos().stream().map(OrcamentoMapper::toResponseDto).toList();
 
             for (OrcamentoResponseDto dto : list){
-                escritor.write("%d;%s;%d;%s;%s;%s;%s;%s;%d;%d;%d\n".formatted(
+                escritor.write("%d;%s;%d;%s;%s;%s;%s;%s;%s;%s;%s\n".formatted(
                         dto.getId(),
                         dto.getDataEvento(),
                         dto.getQtdConvidados(),
@@ -48,9 +50,9 @@ public class ExportacaoService {
                         dto.getInicio(),
                         dto.getFim(),
                         dto.getSugestao(),
-                        dto.getTipoEvento().getId(),
-                        dto.getUsuario().getId(),
-                        dto.getDecoracao().getId()
+                        dto.getTipoEvento().getNome(),
+                        dto.getUsuario().getTelefone(),
+                        dto.getUsuario().getNome()
                 ));
             }
 
@@ -60,5 +62,9 @@ public class ExportacaoService {
         } catch (IOException e) {
             System.out.println("Erro ao escrever arquivo");
         }
+    }
+
+    public String getCsvFilePath() {
+        return CSV_FILE_PATH;
     }
 }
