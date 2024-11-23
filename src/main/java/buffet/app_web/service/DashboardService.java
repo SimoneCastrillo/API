@@ -46,4 +46,16 @@ public class DashboardService implements DashboardStrategy {
     public List<PopularidadeDecoracaoDto> getPopularidadeDecoracao() {
         return orcamentoRepository.getPopularidadeDecoracao();
     }
+
+    public List<LucroPorTipoEventoDto> obterLucroPorTipoEvento() {
+        return orcamentoRepository.calcularLucroPorTipoEvento();
+    }
+
+    public List<QuantidadeOrcamentosPorMesDto> obterQuantidadeOrcamentosPorMes() {
+        return orcamentoRepository.calcularQuantidadeOrcamentosPorMes();
+    }
+
+    public List<FaturamentoDespesaMesDto> getFaturamentoEDespesaPorMes() {
+        return orcamentoRepository.getFaturamentoEDespesaPorMes();
+    }
 }
