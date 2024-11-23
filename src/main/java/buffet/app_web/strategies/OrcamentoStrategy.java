@@ -17,4 +17,5 @@ public interface OrcamentoStrategy {
     Orcamento confirmarDadosDoEvento(Orcamento orcamento, Integer tipoEventoId, Integer decoracaoId);
     List<Orcamento> findByUsuarioId(int id);
     void finalizarOrcamentosExpirados();
+    Orcamento desfazerCancelamento(int id);
 }
