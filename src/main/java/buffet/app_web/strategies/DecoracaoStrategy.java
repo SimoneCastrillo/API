@@ -11,6 +11,6 @@ public interface DecoracaoStrategy {
     Decoracao buscarPorId(int id);
     Decoracao salvar(Decoracao decoracao, Integer tipoEventoId);
     void deletar(int id);
-    List<Decoracao> listarPorTipoDeEvento(String nome);
+    List<Decoracao> listarPorTipoDeEvento(Integer tipoEventoId);
 
 }

@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface DecoracaoRepository extends JpaRepository<Decoracao, Integer> {
-    List<Decoracao> findByTipoEventoNome(String nome);
+    List<Decoracao> findByTipoEventoId(Integer tipoEventoId);
 }

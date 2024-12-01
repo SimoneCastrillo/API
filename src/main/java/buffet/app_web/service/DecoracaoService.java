@@ -43,7 +43,7 @@ public class DecoracaoService implements DecoracaoStrategy {
     }
 
     @Override
-    public List<Decoracao> listarPorTipoDeEvento(String nome) {
-        return decoracaoRepository.findByTipoEventoNome(nome);
+    public List<Decoracao> listarPorTipoDeEvento(Integer tipoEventoId) {
+        return decoracaoRepository.findByTipoEventoId(tipoEventoId);
     }
 }

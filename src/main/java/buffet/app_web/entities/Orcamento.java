@@ -35,6 +35,7 @@ public class Orcamento {
     @ManyToOne
     private Usuario usuario;
     @ManyToOne
+    @JoinColumn(name = "decoracao_id", nullable = true)
     private Decoracao decoracao;
 
     public void finalizarSeDataPassou() {

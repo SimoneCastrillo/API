@@ -174,13 +174,13 @@ public class DecoracaoController {
             )
     })
     @GetMapping("/tipo-de-evento")
-    public ResponseEntity<List<DecoracaoResponseDto>> listarTodos(@RequestParam String nome){
-        if (decoracaoStrategy.listarPorTipoDeEvento(nome).isEmpty()){
+    public ResponseEntity<List<DecoracaoResponseDto>> listarTodos(@RequestParam Integer tipoEventoId){
+        if (decoracaoStrategy.listarPorTipoDeEvento(tipoEventoId).isEmpty()){
             return noContent().build();
         }
 
         List<DecoracaoResponseDto> listaDto =
-                decoracaoStrategy.listarPorTipoDeEvento(nome).stream().map(DecoracaoMapper::toResponseDto).toList();
+                decoracaoStrategy.listarPorTipoDeEvento(tipoEventoId).stream().map(DecoracaoMapper::toResponseDto).toList();
         return ok(listaDto);
     }
 
