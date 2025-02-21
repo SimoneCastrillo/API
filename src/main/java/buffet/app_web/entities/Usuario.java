@@ -20,6 +20,6 @@ public class Usuario {
     private String telefone;
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    @Column(columnDefinition = "VARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String foto;
 }

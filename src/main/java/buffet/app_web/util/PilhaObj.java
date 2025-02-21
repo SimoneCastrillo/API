@@ -47,8 +47,6 @@ public class PilhaObj<T> {
         }
     }
 
-
-    //Getters & Setters (manter)
     public int getTopo() {
         return topo;
     }
