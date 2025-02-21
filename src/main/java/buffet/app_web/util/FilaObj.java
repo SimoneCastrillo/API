@@ -4,7 +4,6 @@ public class FilaObj<T> {
     private int tamanho;
     private T[] fila;
 
-    // Construtor
     public FilaObj(int capacidade) {
         this.tamanho = 0;
         this.fila = (T[]) new Object[capacidade];

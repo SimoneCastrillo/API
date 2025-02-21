@@ -34,8 +34,8 @@ public class OrcamentoService implements OrcamentoStrategy {
     private DecoracaoService decoracaoService;
     @Autowired
     private GoogleService googleService;
-
-    private PilhaObj<Orcamento> pilhaDesfazerCancelamento = new PilhaObj<>(20);
+    @Autowired
+    private PilhaObj<Orcamento> pilhaDesfazerCancelamento;
     private FilaObj<Orcamento> filaConfirmar = new FilaObj<>(50);
 
     @Override
@@ -86,7 +86,7 @@ public class OrcamentoService implements OrcamentoStrategy {
         orcamento.setDecoracao(decoracao);
 
         try {
-            googleService.atualizarEvento("primary", orcamento);
+            googleService.atualizarEvento(System.getenv("GOOGLE_CALENDAR_ID"), orcamento);
         } catch (IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
@@ -97,7 +97,7 @@ public class OrcamentoService implements OrcamentoStrategy {
     public void deletar(Integer id) {
         Orcamento orcamento = buscarPorId(id);
         try {
-            googleService.deletarEvento("primary", orcamento);
+            googleService.deletarEvento(System.getenv("GOOGLE_CALENDAR_ID"), orcamento);
         } catch (IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
@@ -117,7 +117,7 @@ public class OrcamentoService implements OrcamentoStrategy {
         pilhaDesfazerCancelamento.push(clonarOrcamento(orcamento));
 
         try {
-            googleService.deletarEvento("primary", orcamento);
+            googleService.deletarEvento(System.getenv("GOOGLE_CALENDAR_ID"), orcamento);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (GeneralSecurityException e) {
@@ -160,7 +160,7 @@ public class OrcamentoService implements OrcamentoStrategy {
         orcamento.setStatus("CONFIRMADO");
 
         try {
-            googleService.atualizarEvento("primary", orcamento);
+            googleService.atualizarEvento(System.getenv("GOOGLE_CALENDAR_ID"), orcamento);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (GeneralSecurityException e) {
@@ -189,7 +189,7 @@ public class OrcamentoService implements OrcamentoStrategy {
         orcamento.setDecoracao(decoracao);
 
         try {
-            googleService.atualizarEvento("primary", orcamento);
+            googleService.atualizarEvento(System.getenv("GOOGLE_CALENDAR_ID"), orcamento);
         } catch (IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
@@ -208,12 +208,12 @@ public class OrcamentoService implements OrcamentoStrategy {
         }
 
         while (!filaConfirmar.isEmpty()) {
-            Orcamento orcamento = filaConfirmar.poll();
+                Orcamento orcamento = filaConfirmar.poll();
 
             orcamento.finalizarSeDataPassou();
 
             try {
-                googleService.atualizarEvento("primary", orcamento);
+                googleService.atualizarEvento(System.getenv("GOOGLE_CALENDAR_ID"), orcamento);
             } catch (IOException | GeneralSecurityException e) {
                 System.err.println("Erro ao atualizar evento no Google Calendar para o orçamento ID: " + orcamento.getId());
                 continue;
@@ -274,7 +274,7 @@ public class OrcamentoService implements OrcamentoStrategy {
         Orcamento orcamentoAnterior = pilhaDesfazerCancelamento.pop();
         String statusOriginal = orcamentoAnterior.getStatus();
 
-        orcamentoAnterior.setStatus(statusOriginal); // Restoring the original status
+        orcamentoAnterior.setStatus(statusOriginal);
         orcamentoAnterior.setCancelado(false);
 
         googleService.criarEvento(orcamentoAnterior);

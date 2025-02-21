@@ -2,28 +2,23 @@ package buffet.app_web.service;
 
 import buffet.app_web.configuration.Google;
 import buffet.app_web.entities.Orcamento;
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.DateTime;
-import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
+import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.auth.oauth2.ServiceAccountCredentials;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -38,36 +33,22 @@ public class GoogleService {
 
     private static final String APPLICATION_NAME = "Buffet";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
-    private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
-
     private final Calendar calendar;
 
     public GoogleService() throws IOException, GeneralSecurityException {
         this.calendar = getCalendarService();
     }
 
-    private Calendar getCalendarService() throws IOException, GeneralSecurityException {
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        return new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+    public static Calendar getCalendarService() throws GeneralSecurityException, IOException {
+        String googleCredentials = System.getenv("GOOGLE_CALENDAR_CREDENTIALS");
+        InputStream inputStream = new ByteArrayInputStream(googleCredentials.getBytes(StandardCharsets.UTF_8));
+        GoogleCredentials credentials = ServiceAccountCredentials.fromStream(inputStream)
+                .createScoped(Collections.singleton(CalendarScopes.CALENDAR));
+        HttpRequestInitializer requestInitializer  = new HttpCredentialsAdapter(credentials);
+
+        return new Calendar.Builder(GoogleNetHttpTransport.newTrustedTransport(), JSON_FACTORY, requestInitializer)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
-    }
-
-    private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-        InputStream in = GoogleService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-        }
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-                .setAccessType("offline")
-                .build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
     public void criarEvento(Orcamento orcamento) {
@@ -75,7 +56,7 @@ public class GoogleService {
             Google google = createGoogleFromOrcamento(orcamento);
             Event event = buildEvent(orcamento, google);
 
-            Event eventoCriado = calendar.events().insert("primary", event).execute();
+            Event eventoCriado = calendar.events().insert(System.getenv("GOOGLE_CALENDAR_ID"), event).execute();
             String googleEventoId = eventoCriado.getId();
 
             orcamento.setGoogleEventoId(googleEventoId);
@@ -87,6 +68,7 @@ public class GoogleService {
     public void atualizarEvento(String calendarId, Orcamento orcamento) throws IOException, GeneralSecurityException {
         Calendar service = getCalendarService();
         String eventId = orcamento.getGoogleEventoId();
+        Google google = createGoogleFromOrcamento(orcamento);
 
         if (eventId != null) {
             Event event = service.events().get(calendarId, eventId).execute();
@@ -98,23 +80,11 @@ public class GoogleService {
             }
             event.setDescription(buildDescription(orcamento));
 
-            ZoneId zoneId = ZoneId.systemDefault();
+            Event eventUpdate = buildEvent(orcamento, google);
 
-            LocalDateTime inicio = LocalDateTime.of(orcamento.getDataEvento(), orcamento.getInicio());
-            long startTimeInMillis = inicio.atZone(zoneId).toInstant().toEpochMilli();
-            EventDateTime start = new EventDateTime().setDateTime(new DateTime(startTimeInMillis));
-            event.setStart(start);
-
-            LocalDateTime fim = LocalDateTime.of(orcamento.getDataEvento(), orcamento.getFim());
-            long endTimeInMillis = fim.atZone(zoneId).toInstant().toEpochMilli();
-            EventDateTime end = new EventDateTime().setDateTime(new DateTime(endTimeInMillis));
-            event.setEnd(end);
-
-            service.events().update(calendarId, eventId, event).execute();
-            System.out.println("Evento do orçamento atualizado.");
+            service.events().update(calendarId, eventId, eventUpdate).execute();
         } else {
-            System.out.println("ID do evento não encontrado para este orçamento.");
-        }
+            throw new IllegalArgumentException();        }
     }
 
     public void deletarEvento(String calendarId, Orcamento orcamento) throws IOException, GeneralSecurityException {
@@ -123,9 +93,8 @@ public class GoogleService {
 
         if (eventId != null) {
             service.events().delete(calendarId, eventId).execute();
-            System.out.println("Evento do orçamento deletado.");
         } else {
-            System.out.println("ID do evento não encontrado para este orçamento.");
+            throw new IllegalArgumentException();
         }
     }
 
@@ -137,13 +106,20 @@ public class GoogleService {
     }
 
     private Event buildEvent(Orcamento orcamento, Google google) {
-        DateTime startGoogleDateTime = new DateTime(ZonedDateTime.of(google.getStartDateTime(),
-                ZoneId.systemDefault()).toInstant().toEpochMilli());
-        DateTime endGoogleDateTime = new DateTime(ZonedDateTime.of(google.getEndDateTime(),
-                ZoneId.systemDefault()).toInstant().toEpochMilli());
+        String timeZone = "America/Sao_Paulo";
 
-        EventDateTime start = new EventDateTime().setDateTime(startGoogleDateTime);
-        EventDateTime end = new EventDateTime().setDateTime(endGoogleDateTime);
+        ZonedDateTime startZonedDateTime = google.getStartDateTime().atZone(ZoneId.of(timeZone));
+        ZonedDateTime endZonedDateTime = google.getEndDateTime().atZone(ZoneId.of(timeZone));
+
+        DateTime startGoogleDateTime = new DateTime(startZonedDateTime.toInstant().toEpochMilli());
+        DateTime endGoogleDateTime = new DateTime(endZonedDateTime.toInstant().toEpochMilli());
+
+        EventDateTime start = new EventDateTime()
+                .setDateTime(startGoogleDateTime)
+                .setTimeZone(timeZone);
+        EventDateTime end = new EventDateTime()
+                .setDateTime(endGoogleDateTime)
+                .setTimeZone(timeZone);
 
         return new Event()
                 .setSummary(orcamento.getTipoEvento().getNome())
@@ -274,7 +250,6 @@ public class GoogleService {
 
         preencherVetorRecursivo(lista, vetorEventos, indice + 1);
     }
-
 
     public static void mergeSort(int inicio, int fim, Google[] v) {
         if (inicio < fim - 1) {

@@ -97,9 +97,7 @@ public class DecoracaoController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DecoracaoResponseDto> publicar(@ModelAttribute @Valid DecoracaoRequestDto decoracaoRequestDto, Integer tipoEventoId) {
-        System.out.println("Recebendo requisição para publicar decoração: {}" + decoracaoRequestDto.getNome());
         Decoracao decoracao = decoracaoStrategy.salvar(DecoracaoMapper.toEntity(decoracaoRequestDto), tipoEventoId);
-        System.out.println("Decoração salva com sucesso: {}" + decoracao.getId());
         DecoracaoResponseDto decoracaoResponseDto = DecoracaoMapper.toResponseDto(decoracao);
         return ResponseEntity.ok(decoracaoResponseDto);
     }

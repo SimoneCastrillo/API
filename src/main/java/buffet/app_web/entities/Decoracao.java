@@ -16,7 +16,7 @@ public class Decoracao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String nome;
-    @Column(columnDefinition = "VARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String foto;
     @ManyToOne
     private TipoEvento tipoEvento;
