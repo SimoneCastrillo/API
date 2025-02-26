@@ -9,6 +9,8 @@ import buffet.app_web.repositories.OrcamentoRepository;
 import buffet.app_web.strategies.OrcamentoStrategy;
 import buffet.app_web.util.FilaObj;
 import buffet.app_web.util.PilhaObj;
+import buffet.app_web.util.email.ConstroiAssuntosEmail;
+import buffet.app_web.util.email.ConstroiMensagensEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -34,6 +36,8 @@ public class OrcamentoService implements OrcamentoStrategy {
     private DecoracaoService decoracaoService;
     @Autowired
     private GoogleService googleService;
+    @Autowired
+    private EmailService emailService;
     @Autowired
     private PilhaObj<Orcamento> pilhaDesfazerCancelamento;
     private FilaObj<Orcamento> filaConfirmar = new FilaObj<>(50);
@@ -63,6 +67,11 @@ public class OrcamentoService implements OrcamentoStrategy {
         orcamento.setDecoracao(decoracao);
 
         googleService.criarEvento(orcamento);
+        emailService.sendSimpleMessage(
+                orcamento.getUsuario().getEmail(),
+                ConstroiAssuntosEmail.construirAssuntoOrcamentoCriado(),
+                ConstroiMensagensEmail.construirMensagemOrcamentoCriado(orcamento)
+                );
         return orcamentoRepository.save(orcamento);
     }
 
@@ -127,6 +136,11 @@ public class OrcamentoService implements OrcamentoStrategy {
         orcamento.setId(id);
         orcamento.setCancelado(true);
         orcamento.setStatus("CANCELADO");
+        emailService.sendSimpleMessage(
+                orcamento.getUsuario().getEmail(),
+                ConstroiAssuntosEmail.construirAssuntoOrcamentoCancelado(),
+                ConstroiMensagensEmail.construirMensagemOrcamentoCancelado(orcamento)
+        );
         return orcamentoRepository.save(orcamento);
     }
 
@@ -193,8 +207,13 @@ public class OrcamentoService implements OrcamentoStrategy {
         } catch (IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
-        return orcamentoRepository.save(orcamento);
 
+        emailService.sendSimpleMessage(
+                orcamento.getUsuario().getEmail(),
+                ConstroiAssuntosEmail.construirAssuntoOrcamentoConfirmado(),
+                ConstroiMensagensEmail.construirMensagemOrcamentoConfirmado(orcamento)
+        );
+        return orcamentoRepository.save(orcamento);
     }
 
     @Override
