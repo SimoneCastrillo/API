@@ -84,7 +84,8 @@ public class GoogleService {
 
             service.events().update(calendarId, eventId, eventUpdate).execute();
         } else {
-            throw new IllegalArgumentException();        }
+            throw new IllegalArgumentException();
+        }
     }
 
     public void deletarEvento(String calendarId, Orcamento orcamento) throws IOException, GeneralSecurityException {
