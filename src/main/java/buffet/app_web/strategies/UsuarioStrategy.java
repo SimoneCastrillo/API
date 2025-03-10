@@ -14,6 +14,9 @@ public interface UsuarioStrategy {
     Usuario atualizar(Usuario usuario);
     void deletar(Integer id);
     UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto);
+    void enviarCodigo(String email);
+    Usuario alterarSenha(String email, String novaSenha, String novaSenhaConfirmacao);
+    void validar(String email, String codigoInserido);
 }
 
 

@@ -67,7 +67,7 @@ public class OrcamentoService implements OrcamentoStrategy {
         orcamento.setDecoracao(decoracao);
 
         googleService.criarEvento(orcamento);
-        emailService.sendSimpleMessage(
+        emailService.enviarEmail(
                 orcamento.getUsuario().getEmail(),
                 ConstroiAssuntosEmail.construirAssuntoOrcamentoCriado(),
                 ConstroiMensagensEmail.construirMensagemOrcamentoCriado(orcamento)
@@ -136,7 +136,7 @@ public class OrcamentoService implements OrcamentoStrategy {
         orcamento.setId(id);
         orcamento.setCancelado(true);
         orcamento.setStatus("CANCELADO");
-        emailService.sendSimpleMessage(
+        emailService.enviarEmail(
                 orcamento.getUsuario().getEmail(),
                 ConstroiAssuntosEmail.construirAssuntoOrcamentoCancelado(),
                 ConstroiMensagensEmail.construirMensagemOrcamentoCancelado(orcamento)
@@ -208,7 +208,7 @@ public class OrcamentoService implements OrcamentoStrategy {
             throw new RuntimeException(e);
         }
 
-        emailService.sendSimpleMessage(
+        emailService.enviarEmail(
                 orcamento.getUsuario().getEmail(),
                 ConstroiAssuntosEmail.construirAssuntoOrcamentoConfirmado(),
                 ConstroiMensagensEmail.construirMensagemOrcamentoConfirmado(orcamento)

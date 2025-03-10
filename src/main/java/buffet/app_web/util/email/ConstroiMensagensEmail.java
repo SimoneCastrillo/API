@@ -1,6 +1,7 @@
 package buffet.app_web.util.email;
 
 import buffet.app_web.entities.Orcamento;
+import buffet.app_web.entities.Usuario;
 
 import java.time.format.DateTimeFormatter;
 
@@ -54,6 +55,14 @@ public class ConstroiMensagensEmail {
                """.formatted(
                 orcamento.getUsuario().getNome(),
                 formatarData(orcamento));
+    }
+
+    public static String construirMensagemCodigo(String codigo){
+        return  """
+               O código de confirmação é: %s
+               """.formatted(
+                       codigo
+        );
     }
 
     private static String formatarData(Orcamento orcamento){
