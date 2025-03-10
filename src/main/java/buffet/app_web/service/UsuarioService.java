@@ -8,9 +8,12 @@ import buffet.app_web.repositories.UsuarioRepository;
 import buffet.app_web.service.autenticacao.dto.UsuarioLoginDto;
 import buffet.app_web.service.autenticacao.dto.UsuarioTokenDto;
 import buffet.app_web.strategies.UsuarioStrategy;
+import buffet.app_web.util.email.ConstroiAssuntosEmail;
+import buffet.app_web.util.email.ConstroiMensagensEmail;
+import buffet.app_web.util.email.GeradorCodigoVerificacao;
+import org.hibernate.dialect.function.ListaggStringAggEmulation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UsuarioService implements UsuarioStrategy {
@@ -39,7 +41,8 @@ public class UsuarioService implements UsuarioStrategy {
 
     @Autowired
     private OrcamentoRepository orcamentoRepository;
-
+    @Autowired
+    private EmailService emailService;
 
     public List<Usuario> listarTodos(){
         return  usuarioRepository.findAll();
@@ -76,10 +79,9 @@ public class UsuarioService implements UsuarioStrategy {
         final Authentication authentication = this.authenticationManager.authenticate(credentials);
 
         Usuario usuarioAutenticado =
-                usuarioRepository.findByEmail(usuarioLoginDto.getEmail())
-                        .orElseThrow(
-                                () -> new ResponseStatusException(404, "Email do usuário não cadastrado", null)
-                        );
+                usuarioRepository
+                        .findByEmail(usuarioLoginDto.getEmail())
+                        .orElseThrow(() -> new ResponseStatusException(404, "Email do usuário não cadastrado", null));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -87,5 +89,52 @@ public class UsuarioService implements UsuarioStrategy {
         Integer qtdOrcamento = orcamentoRepository.countByUsuarioId(usuarioAutenticado.getId());
 
         return UsuarioMapper.of(usuarioAutenticado, token, qtdOrcamento);
+    }
+
+
+    public Usuario alterarSenha(String email, String novaSenha, String novaSenhaConfirmacao) {
+        Usuario usuario = buscarPorEmail(email);
+
+        if (!novaSenha.equals(novaSenhaConfirmacao)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "As senhas não são iguais");
+        }
+
+        String novaSenhaCriptografada = passwordEncoder.encode(novaSenha);
+        usuario.setSenha(novaSenhaCriptografada);
+        GeradorCodigoVerificacao.removerCodigo(email);
+
+        return usuarioRepository.save(usuario);
+    }
+
+    public void enviarCodigo(String email) {
+        buscarPorEmail(email);
+
+        String codigo = GeradorCodigoVerificacao.gerarCodigoVerificacao();
+        GeradorCodigoVerificacao.armazenarCodigo(email, codigo);
+
+        emailService.enviarCodigoVerificacao(
+                email,
+                ConstroiAssuntosEmail.construirAssuntoCodigoVerficacao(),
+                ConstroiMensagensEmail.construirMensagemCodigo(codigo)
+        );
+    }
+
+    public void validar(String email, String codigoInserido){
+        buscarPorEmail(email);
+
+        if (!validarCodigo(email, codigoInserido)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public static boolean validarCodigo(String email, String codigoInserido) {
+        String codigoArmazenado = GeradorCodigoVerificacao.getCodigo(email);
+        return codigoArmazenado != null && codigoArmazenado.equals(codigoInserido);
+    }
+
+    public Usuario buscarPorEmail(String email){
+        return usuarioRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }

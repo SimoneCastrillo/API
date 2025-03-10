@@ -12,4 +12,7 @@ public class ConstroiAssuntosEmail {
     public static String construirAssuntoOrcamentoCancelado(){
         return "Orçamento cancelado com sucesso.";
     }
+    public static String construirAssuntoCodigoVerficacao(){
+        return "Código de confirmação para alterar senha.";
+    }
 }

@@ -1,7 +1,6 @@
 package buffet.app_web.controllers;
 
-import buffet.app_web.dto.request.usuario.UsuarioCriacaoDto;
-import buffet.app_web.dto.request.usuario.UsuarioUpdateDto;
+import buffet.app_web.dto.request.usuario.*;
 import buffet.app_web.dto.response.usuario.UsuarioPorIdResponseDto;
 import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
 import buffet.app_web.entities.Usuario;
@@ -9,6 +8,7 @@ import buffet.app_web.enums.UserRole;
 import buffet.app_web.mapper.UsuarioMapper;
 import buffet.app_web.repositories.UsuarioRepository;
 import buffet.app_web.service.OrcamentoService;
+import buffet.app_web.service.UsuarioService;
 import buffet.app_web.service.autenticacao.dto.UsuarioLoginDto;
 import buffet.app_web.service.autenticacao.dto.UsuarioTokenDto;
 import buffet.app_web.strategies.UsuarioStrategy;
@@ -36,7 +36,6 @@ import static org.springframework.http.ResponseEntity.*;
 public class UsuarioController {
     @Autowired
     private UsuarioStrategy usuarioStrategy;
-
     @Autowired
     private OrcamentoService orcamentoService;
 
@@ -116,7 +115,6 @@ public class UsuarioController {
         UsuarioResponseDto usuarioResponseDto = UsuarioMapper.toResponseDto(usuarioSalvo);
 
         return created(null).body(usuarioResponseDto);
-
     }
 
     @Operation(summary = "Atualizar um usuário", description = """
@@ -194,5 +192,27 @@ public class UsuarioController {
         UsuarioTokenDto usuarioTokenDto = this.usuarioStrategy.autenticar(usuarioLoginDto);
 
         return ResponseEntity.status(200).body(usuarioTokenDto);
+    }
+
+    @PatchMapping("/{id}/alterar-senha")
+    public ResponseEntity<UsuarioResponseDto> alterarSenha(@RequestBody @Valid MudancaSenhaDto dto, @PathVariable int id){
+        Usuario usuario = usuarioStrategy.alterarSenha(dto.getEmail(), dto.getNovaSenha(), dto.getConfirmacaoNovaSenha());
+        UsuarioResponseDto responseDto = UsuarioMapper.toResponseDto(usuario);
+
+        return ok(responseDto);
+    }
+
+    @PostMapping("/enviar-codigo")
+    public ResponseEntity<Void> enviarCodigo(@RequestBody @Valid ConfirmarEmailDto dto){
+        usuarioStrategy.enviarCodigo(dto.getEmail());
+
+        return ok().build();
+    }
+
+    @PostMapping("/verificar-codigo")
+    public ResponseEntity<Void> verificarCodigo(@RequestBody @Valid CodigoVerficacaoDto dto){
+        usuarioStrategy.validar(dto.getEmail(), dto.getCodigo());
+
+        return ok().build();
     }
 }
