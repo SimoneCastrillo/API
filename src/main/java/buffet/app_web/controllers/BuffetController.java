@@ -22,6 +22,10 @@ public class BuffetController {
 
     @GetMapping
     public ResponseEntity<List<BuffetResponseDto>> listar() {
+        if (buffetService.listar().isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
         List<BuffetResponseDto> buffets =
                 buffetService.listar().stream().map(BuffetMapper::toResponseDto).toList();
         return ResponseEntity.ok(buffets);

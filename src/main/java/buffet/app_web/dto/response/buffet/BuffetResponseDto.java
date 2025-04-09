@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 public class BuffetResponseDto {
     private Long id;
-    private MultipartFile imagem;
+    private String imagem;
     private String nome;
     private String urlSite;
     private String telefone;

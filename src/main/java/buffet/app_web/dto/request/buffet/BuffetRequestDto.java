@@ -16,6 +16,6 @@ public class BuffetRequestDto {
     private String urlSite;
     @NotBlank
     private String telefone;
-    @NotBlank
+    @NotNull
     private Plano plano;
 }

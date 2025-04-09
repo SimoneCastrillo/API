@@ -1,9 +1,7 @@
 package buffet.app_web.service;
 
-import buffet.app_web.entities.Orcamento;
-import buffet.app_web.entities.TipoEvento;
-import buffet.app_web.entities.Usuario;
-import buffet.app_web.entities.Decoracao;
+import buffet.app_web.entities.*;
+import buffet.app_web.enums.Plano;
 import buffet.app_web.enums.UserRole;
 import buffet.app_web.repositories.OrcamentoRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +37,9 @@ class OrcamentoServiceTest {
     private DecoracaoService decoracaoService;
 
     @Mock
+    private BuffetService buffetService;
+
+    @Mock
     private GoogleService googleService;
 
     @InjectMocks
@@ -71,12 +72,13 @@ class OrcamentoServiceTest {
         TipoEvento tipoEvento = new TipoEvento(1, "Rave");
         Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null);
         Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento);
+        Buffet buffet = new Buffet(7800000000L, "abc", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
 
         List<Orcamento> orcamentos = List.of(
                 new Orcamento(1, LocalDate.now(), 50, "Confirmado", false,
                         LocalTime.of(18, 0), LocalTime.of(23, 0), "Chocolate",
                         "Frango assado", 500.0, 1000.0, 500.0, "Tudo certo",
-                        "google-event-123", tipoEvento, usuario, decoracao)
+                        "google-event-123", tipoEvento, usuario, decoracao, buffet)
         );
 
         // WHEN
@@ -108,12 +110,13 @@ class OrcamentoServiceTest {
         TipoEvento tipoEvento = new TipoEvento(1, "Rave");
         Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null);
         Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento);
+        Buffet buffet = new Buffet(7800000000L, "abc", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
 
         Orcamento orcamento = new Orcamento(1, LocalDate.now(), 50, "Confirmado", false,
                 LocalTime.of(18, 0), LocalTime.of(23, 0),
                 "Chocolate", "Frango assado", 500.0, 1000.0,
                 500.0, "Tudo certo", "google-event-123",
-                tipoEvento, usuario, decoracao);
+                tipoEvento, usuario, decoracao, buffet);
 
         // WHEN
         Mockito.when(orcamentoRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(orcamento));
@@ -151,12 +154,13 @@ class OrcamentoServiceTest {
         TipoEvento tipoEvento = new TipoEvento(1, "Rave");
         Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null);
         Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento);
+        Buffet buffet = new Buffet(78000000L, "abc", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
 
         Orcamento orcamento = new Orcamento(1, LocalDate.now(), 50, "Confirmado", false,
                 LocalTime.of(18, 0), LocalTime.of(23, 0),
                 "Chocolate", "Frango assado", 500.0, 1000.0,
                 500.0, "Tudo certo", "google-event-123",
-                tipoEvento, usuario, decoracao);
+                tipoEvento, usuario, decoracao, buffet);
 
         // WHEN
         Mockito.when(orcamentoRepository.save(Mockito.any(Orcamento.class))).thenReturn(orcamento);
@@ -167,12 +171,15 @@ class OrcamentoServiceTest {
         Mockito.when(usuarioService.buscarPorId(Mockito.anyInt()))
                 .thenReturn(usuario);
 
+        Mockito.when(buffetService.buscarPorId(Mockito.anyLong()))
+                .thenReturn(buffet);
+
         Mockito.when(decoracaoService.buscarPorId(Mockito.anyInt()))
                 .thenReturn(decoracao);
 
 
         // THEN
-        Orcamento resultado = orcamentoService.salvar(orcamento, tipoEvento.getId(), usuario.getId(), decoracao.getId());
+        Orcamento resultado = orcamentoService.salvar(orcamento, tipoEvento.getId(), usuario.getId(), decoracao.getId(), buffet.getId());
 
         // ASSERT
         assertNotNull(resultado);
