@@ -1,10 +1,7 @@
 package buffet.app_web.service;
 
 import buffet.app_web.dto.response.dashboard.TipoEventoContagemDto;
-import buffet.app_web.entities.Decoracao;
-import buffet.app_web.entities.Orcamento;
-import buffet.app_web.entities.TipoEvento;
-import buffet.app_web.entities.Usuario;
+import buffet.app_web.entities.*;
 import buffet.app_web.repositories.OrcamentoRepository;
 import buffet.app_web.strategies.OrcamentoStrategy;
 import buffet.app_web.util.FilaObj;
@@ -35,6 +32,8 @@ public class OrcamentoService implements OrcamentoStrategy {
     @Autowired
     private DecoracaoService decoracaoService;
     @Autowired
+    private BuffetService buffetService;
+    @Autowired
     private GoogleService googleService;
     @Autowired
     private EmailService emailService;
@@ -53,7 +52,7 @@ public class OrcamentoService implements OrcamentoStrategy {
     }
 
     @Override
-    public Orcamento salvar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId) {
+    public Orcamento salvar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Long buffetId) {
         Decoracao decoracao = null;
         if (decoracaoId != null) {
             decoracao = decoracaoService.buscarPorId(decoracaoId);
@@ -61,10 +60,12 @@ public class OrcamentoService implements OrcamentoStrategy {
 
         TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
         Usuario usuario = usuarioService.buscarPorId(usuarioId);
+        Buffet buffet = buffetService.buscarPorId(buffetId);
 
         orcamento.setTipoEvento(tipoEvento);
         orcamento.setUsuario(usuario);
         orcamento.setDecoracao(decoracao);
+        orcamento.setBuffet(buffet);
 
         googleService.criarEvento(orcamento);
         emailService.enviarEmail(
@@ -75,7 +76,7 @@ public class OrcamentoService implements OrcamentoStrategy {
         return orcamentoRepository.save(orcamento);
     }
 
-    public Orcamento atualizar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Authentication authentication) {
+    public Orcamento atualizar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Long buffetId, Authentication authentication) {
         if (orcamento.getStatus().equals("CANCELADO")){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -89,10 +90,12 @@ public class OrcamentoService implements OrcamentoStrategy {
 
         TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
         Usuario usuario = usuarioService.buscarPorId(usuarioId);
+        Buffet buffet = buffetService.buscarPorId(buffetId);
 
         orcamento.setTipoEvento(tipoEvento);
         orcamento.setUsuario(usuario);
         orcamento.setDecoracao(decoracao);
+        orcamento.setBuffet(buffet);
 
         try {
             googleService.atualizarEvento(System.getenv("GOOGLE_CALENDAR_ID"), orcamento);
@@ -282,6 +285,7 @@ public class OrcamentoService implements OrcamentoStrategy {
         clone.setTipoEvento(orcamento.getTipoEvento());
         clone.setUsuario(orcamento.getUsuario());
         clone.setDecoracao(orcamento.getDecoracao());
+        clone.setBuffet(orcamento.getBuffet());
         return clone;
     }
 

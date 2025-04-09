@@ -4,14 +4,16 @@ import buffet.app_web.dto.request.orcamento.OrcamentoConfirmacaoDto;
 import buffet.app_web.dto.request.orcamento.OrcamentoRequestDto;
 import buffet.app_web.dto.response.decoracao.DecoracaoResponseDto;
 import buffet.app_web.dto.response.orcamento.OrcamentoResponseDto;
-import buffet.app_web.entities.Decoracao;
-import buffet.app_web.entities.Orcamento;
-import buffet.app_web.entities.TipoEvento;
-import buffet.app_web.entities.Usuario;
+import buffet.app_web.entities.*;
 
 public class OrcamentoMapper {
     public static Orcamento toEntity(OrcamentoRequestDto dto){
         if (dto == null) return null;
+
+        Buffet buffet = Buffet
+                .builder()
+                .id(dto.getBuffetId())
+                .build();
 
         Orcamento orcamento = Orcamento
                 .builder()
@@ -53,6 +55,7 @@ public class OrcamentoMapper {
         TipoEvento tipoEvento = orcamento.getTipoEvento();
         Usuario usuario = orcamento.getUsuario();
         Decoracao decoracao = orcamento.getDecoracao();
+        Buffet buffet = orcamento.getBuffet();
 
         DecoracaoResponseDto.TipoEventoDto tipoEventoDecoracaoDto = null;
         if (decoracao != null) {
@@ -62,6 +65,16 @@ public class OrcamentoMapper {
                     .nome(decoracao.getTipoEvento().getNome())
                     .build();
         }
+
+        OrcamentoResponseDto.BuffetDto buffetDto = OrcamentoResponseDto.BuffetDto
+                .builder()
+                .id(buffet.getId())
+                .nome(buffet.getNome())
+                .urlSite(buffet.getUrlSite())
+                .imagem(buffet.getImagem())
+                .telefone(buffet.getTelefone())
+                .plano(buffet.getPlano())
+                .build();
 
         OrcamentoResponseDto.TipoEventoDto tipoEventoDto = OrcamentoResponseDto.TipoEventoDto
                 .builder()
@@ -106,6 +119,7 @@ public class OrcamentoMapper {
                 .tipoEvento(tipoEventoDto)
                 .usuario(usuarioDto)
                 .decoracao(decoracaoDto)
+                .buffet(buffetDto)
                 .build();
 
         return dto;

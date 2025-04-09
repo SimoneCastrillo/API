@@ -20,7 +20,6 @@ public class OrcamentoRequestDto {
     @NotNull
     @Future
     private LocalDate dataEvento;
-
     @NotNull
     @Max(value = 180)
     private Integer qtdConvidados;
@@ -33,4 +32,6 @@ public class OrcamentoRequestDto {
     private Integer usuarioId;
     @Column(nullable = true)
     private Integer decoracaoId;
+    @NotNull
+    private Long buffetId;
 }
