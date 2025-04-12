@@ -16,6 +16,7 @@ public class Buffet {
     private Long id;
     @Column(columnDefinition = "TEXT")
     private String imagem;
+    private String email;
     private String nome;
     private String urlSite;
     private String telefone;

@@ -70,6 +70,7 @@ public class OrcamentoMapper {
                 .builder()
                 .id(buffet.getId())
                 .nome(buffet.getNome())
+                .email(buffet.getEmail())
                 .urlSite(buffet.getUrlSite())
                 .imagem(buffet.getImagem())
                 .telefone(buffet.getTelefone())

@@ -11,6 +11,7 @@ public class BuffetResponseDto {
     private Long id;
     private String imagem;
     private String nome;
+    private String email;
     private String urlSite;
     private String telefone;
     private Plano plano;

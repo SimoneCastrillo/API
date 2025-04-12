@@ -72,7 +72,7 @@ class OrcamentoServiceTest {
         TipoEvento tipoEvento = new TipoEvento(1, "Rave");
         Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null);
         Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento);
-        Buffet buffet = new Buffet(7800000000L, "abc", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+        Buffet buffet = new Buffet(7800000000L, "abc", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
 
         List<Orcamento> orcamentos = List.of(
                 new Orcamento(1, LocalDate.now(), 50, "Confirmado", false,
@@ -110,7 +110,7 @@ class OrcamentoServiceTest {
         TipoEvento tipoEvento = new TipoEvento(1, "Rave");
         Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null);
         Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento);
-        Buffet buffet = new Buffet(7800000000L, "abc", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+        Buffet buffet = new Buffet(7800000000L, "abc", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
 
         Orcamento orcamento = new Orcamento(1, LocalDate.now(), 50, "Confirmado", false,
                 LocalTime.of(18, 0), LocalTime.of(23, 0),
@@ -154,7 +154,7 @@ class OrcamentoServiceTest {
         TipoEvento tipoEvento = new TipoEvento(1, "Rave");
         Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null);
         Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento);
-        Buffet buffet = new Buffet(78000000L, "abc", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+        Buffet buffet = new Buffet(7800000000L, "abc", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
 
         Orcamento orcamento = new Orcamento(1, LocalDate.now(), 50, "Confirmado", false,
                 LocalTime.of(18, 0), LocalTime.of(23, 0),

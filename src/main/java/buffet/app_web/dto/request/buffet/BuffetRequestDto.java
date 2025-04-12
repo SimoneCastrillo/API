@@ -13,6 +13,8 @@ public class BuffetRequestDto {
     private MultipartFile imagem;
     @NotBlank
     private String nome;
+    @NotBlank
+    private String email;
     private String urlSite;
     @NotBlank
     private String telefone;
