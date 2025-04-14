@@ -34,6 +34,8 @@ public class OrcamentoService implements OrcamentoStrategy {
     @Autowired
     private BuffetService buffetService;
     @Autowired
+    private EnderecoService enderecoService;
+    @Autowired
     private GoogleService googleService;
     @Autowired
     private EmailService emailService;
@@ -52,7 +54,7 @@ public class OrcamentoService implements OrcamentoStrategy {
     }
 
     @Override
-    public Orcamento salvar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Long buffetId) {
+    public Orcamento salvar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Long buffetId, Long enderecoId) {
         Decoracao decoracao = null;
         if (decoracaoId != null) {
             decoracao = decoracaoService.buscarPorId(decoracaoId);
@@ -61,11 +63,17 @@ public class OrcamentoService implements OrcamentoStrategy {
         TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
         Usuario usuario = usuarioService.buscarPorId(usuarioId);
         Buffet buffet = buffetService.buscarPorId(buffetId);
+        Endereco endereco = enderecoService.buscarPorId(enderecoId);
+
+        if (!endereco.getBuffet().getId().equals(buffetId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Este endereço não pertence ao buffet selecionado");
+        }
 
         orcamento.setTipoEvento(tipoEvento);
         orcamento.setUsuario(usuario);
         orcamento.setDecoracao(decoracao);
         orcamento.setBuffet(buffet);
+        orcamento.setEndereco(endereco);
 
         googleService.criarEvento(orcamento);
         emailService.enviarEmail(
@@ -76,7 +84,7 @@ public class OrcamentoService implements OrcamentoStrategy {
         return orcamentoRepository.save(orcamento);
     }
 
-    public Orcamento atualizar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Long buffetId, Authentication authentication) {
+    public Orcamento atualizar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Long buffetId, Long enderecoId, Authentication authentication) {
         if (orcamento.getStatus().equals("CANCELADO")){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -91,11 +99,17 @@ public class OrcamentoService implements OrcamentoStrategy {
         TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
         Usuario usuario = usuarioService.buscarPorId(usuarioId);
         Buffet buffet = buffetService.buscarPorId(buffetId);
+        Endereco endereco = enderecoService.buscarPorId(enderecoId);
+
+        if (!endereco.getBuffet().getId().equals(buffetId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Este endereço não pertence ao buffet selecionado");
+        }
 
         orcamento.setTipoEvento(tipoEvento);
         orcamento.setUsuario(usuario);
         orcamento.setDecoracao(decoracao);
         orcamento.setBuffet(buffet);
+        orcamento.setEndereco(endereco);
 
         try {
             googleService.atualizarEvento(System.getenv("GOOGLE_CALENDAR_ID"), orcamento);

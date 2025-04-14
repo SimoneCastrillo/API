@@ -35,5 +35,4 @@ public class OrcamentoConfirmacaoDto {
     @Column(nullable = true)
     private Integer decoracaoId;
     private Integer buffetId;
-
 }

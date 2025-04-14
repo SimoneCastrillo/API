@@ -72,13 +72,14 @@ class OrcamentoServiceTest {
         TipoEvento tipoEvento = new TipoEvento(1, "Rave");
         Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null);
         Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento);
-        Buffet buffet = new Buffet(7800000000L, "abc", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+        Buffet buffet = new Buffet(7800000000L, "abc", "descricao", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+        Endereco endereco = new Endereco(780000000L, "rua 1", "1", "Buffet", "Consolação", "São Paulo", "SP", "06123181", buffet);
 
         List<Orcamento> orcamentos = List.of(
                 new Orcamento(1, LocalDate.now(), 50, "Confirmado", false,
                         LocalTime.of(18, 0), LocalTime.of(23, 0), "Chocolate",
                         "Frango assado", 500.0, 1000.0, 500.0, "Tudo certo",
-                        "google-event-123", tipoEvento, usuario, decoracao, buffet)
+                        "google-event-123", tipoEvento, usuario, decoracao, buffet, endereco)
         );
 
         // WHEN
@@ -110,13 +111,14 @@ class OrcamentoServiceTest {
         TipoEvento tipoEvento = new TipoEvento(1, "Rave");
         Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null);
         Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento);
-        Buffet buffet = new Buffet(7800000000L, "abc", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+        Buffet buffet = new Buffet(7800000000L, "abc", "descricao", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+        Endereco endereco = new Endereco(780000000L, "rua 1", "1", "Buffet", "Consolação", "São Paulo", "SP", "06123181", buffet);
 
         Orcamento orcamento = new Orcamento(1, LocalDate.now(), 50, "Confirmado", false,
                 LocalTime.of(18, 0), LocalTime.of(23, 0),
                 "Chocolate", "Frango assado", 500.0, 1000.0,
                 500.0, "Tudo certo", "google-event-123",
-                tipoEvento, usuario, decoracao, buffet);
+                tipoEvento, usuario, decoracao, buffet, endereco);
 
         // WHEN
         Mockito.when(orcamentoRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(orcamento));
@@ -154,13 +156,14 @@ class OrcamentoServiceTest {
         TipoEvento tipoEvento = new TipoEvento(1, "Rave");
         Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null);
         Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento);
-        Buffet buffet = new Buffet(7800000000L, "abc", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+        Buffet buffet = new Buffet(7800000000L, "abc", "descricao", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+        Endereco endereco = new Endereco(780000000L, "rua 1", "1", "Buffet", "Consolação", "São Paulo", "SP", "06123181", buffet);
 
         Orcamento orcamento = new Orcamento(1, LocalDate.now(), 50, "Confirmado", false,
                 LocalTime.of(18, 0), LocalTime.of(23, 0),
                 "Chocolate", "Frango assado", 500.0, 1000.0,
                 500.0, "Tudo certo", "google-event-123",
-                tipoEvento, usuario, decoracao, buffet);
+                tipoEvento, usuario, decoracao, buffet, endereco);
 
         // WHEN
         Mockito.when(orcamentoRepository.save(Mockito.any(Orcamento.class))).thenReturn(orcamento);
@@ -179,7 +182,7 @@ class OrcamentoServiceTest {
 
 
         // THEN
-        Orcamento resultado = orcamentoService.salvar(orcamento, tipoEvento.getId(), usuario.getId(), decoracao.getId(), buffet.getId());
+        Orcamento resultado = orcamentoService.salvar(orcamento, tipoEvento.getId(), usuario.getId(), decoracao.getId(), buffet.getId(), endereco.getId());
 
         // ASSERT
         assertNotNull(resultado);

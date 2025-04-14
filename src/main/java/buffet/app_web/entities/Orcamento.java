@@ -39,6 +39,8 @@ public class Orcamento {
     private Decoracao decoracao;
     @ManyToOne
     private Buffet buffet;
+    @ManyToOne
+    private Endereco endereco;
 
     public void finalizarSeDataPassou() {
         if (this.status.equals("CONFIRMADO") && this.dataEvento.isBefore(LocalDate.now())) {

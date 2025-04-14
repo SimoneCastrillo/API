@@ -34,4 +34,6 @@ public class OrcamentoRequestDto {
     private Integer decoracaoId;
     @NotNull
     private Long buffetId;
+    @NotNull
+    private Long enderecoId;
 }

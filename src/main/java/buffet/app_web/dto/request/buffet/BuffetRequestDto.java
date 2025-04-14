@@ -15,6 +15,7 @@ public class BuffetRequestDto {
     private String nome;
     @NotBlank
     private String email;
+    private String descricao;
     private String urlSite;
     @NotBlank
     private String telefone;
