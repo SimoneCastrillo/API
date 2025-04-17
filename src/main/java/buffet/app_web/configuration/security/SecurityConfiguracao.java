@@ -64,6 +64,8 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/api/eventos/pesquisa"),
             new AntPathRequestMatcher("/api/eventos/alfabetica"),
             new AntPathRequestMatcher("/tipos-evento"),
+            new AntPathRequestMatcher("/buffets"),
+            new AntPathRequestMatcher("/enderecos")
     };
 
     @Bean
