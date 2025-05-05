@@ -1,5 +1,7 @@
 package buffet.app_web.mapper;
 
+import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
+import buffet.app_web.entities.Buffet;
 import buffet.app_web.enums.UserRole;
 import buffet.app_web.dto.request.usuario.UsuarioCriacaoDto;
 import buffet.app_web.dto.request.usuario.UsuarioUpdateDto;
@@ -15,6 +17,20 @@ public class UsuarioMapper {
     public static UsuarioResponseDto toResponseDto(Usuario usuario){
         if (usuario == null) return null;
 
+        Buffet buffet = usuario.getBuffet();
+
+        UsuarioResponseDto.BuffetResponseDto buffetDto = UsuarioResponseDto.BuffetResponseDto
+                .builder()
+                .id(buffet.getId())
+                .nome(buffet.getNome())
+                .email(buffet.getEmail())
+                .descricao(buffet.getDescricao())
+                .imagem(buffet.getImagem())
+                .urlSite(buffet.getUrlSite())
+                .telefone(buffet.getTelefone())
+                .plano(buffet.getPlano())
+                .build();
+
         return UsuarioResponseDto
                 .builder()
                 .id(usuario.getId())
@@ -24,6 +40,7 @@ public class UsuarioMapper {
                 .telefone(usuario.getTelefone())
                 .role(usuario.getRole())
                 .foto(usuario.getFoto())
+                .buffet(buffetDto)
                 .build();
     }
 
@@ -39,6 +56,7 @@ public class UsuarioMapper {
                 .telefone(usuario.getTelefone())
                 .role(usuario.getRole())
                 .foto(usuario.getFoto())
+                .buffetId(usuario.getBuffet().getId())
                 .build();
     }
 
@@ -67,7 +85,6 @@ public class UsuarioMapper {
     public static Usuario toEntity(UsuarioCriacaoDto dto){
         if (dto == null) return null;
 
-
         return Usuario
                 .builder()
                 .nome(dto.getNome())
@@ -92,5 +109,4 @@ public class UsuarioMapper {
 
         return usuarioTokenDto;
     }
-
 }

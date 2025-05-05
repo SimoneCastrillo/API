@@ -69,10 +69,10 @@ class OrcamentoServiceTest {
     @DisplayName("Dado que, tenho algo no banco, retorna lista com orçamentos")
     void buscarTodosListaCheia() {
         // GIVEN
-        TipoEvento tipoEvento = new TipoEvento(1, "Rave");
-        Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null);
-        Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento);
         Buffet buffet = new Buffet(7800000000L, "abc", "descricao", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+        TipoEvento tipoEvento = new TipoEvento(1, "Rave", buffet);
+        Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null, buffet);
+        Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento, buffet);
         Endereco endereco = new Endereco(780000000L, "rua 1", "1", "Buffet", "Consolação", "São Paulo", "SP", "06123181", buffet);
 
         List<Orcamento> orcamentos = List.of(
@@ -108,10 +108,10 @@ class OrcamentoServiceTest {
     void buscarPorIdCorretamente() {
         // GIVEN
         // GIVEN
-        TipoEvento tipoEvento = new TipoEvento(1, "Rave");
-        Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null);
-        Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento);
         Buffet buffet = new Buffet(7800000000L, "abc", "descricao", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+        TipoEvento tipoEvento = new TipoEvento(1, "Rave", buffet);
+        Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null, buffet);
+        Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento, buffet);
         Endereco endereco = new Endereco(780000000L, "rua 1", "1", "Buffet", "Consolação", "São Paulo", "SP", "06123181", buffet);
 
         Orcamento orcamento = new Orcamento(1, LocalDate.now(), 50, "Confirmado", false,
@@ -152,11 +152,10 @@ class OrcamentoServiceTest {
     @DisplayName("Dado que, o orçamento é novo, salva corretamente")
     void salvarOrcamentoCorretamente() {
         // GIVEN
-        // GIVEN
-        TipoEvento tipoEvento = new TipoEvento(1, "Rave");
-        Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null);
-        Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento);
         Buffet buffet = new Buffet(7800000000L, "abc", "descricao", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+        TipoEvento tipoEvento = new TipoEvento(1, "Rave", buffet);
+        Usuario usuario = new Usuario(1, "Fernanda", "fernanda@email.com", "123456", "000", UserRole.USUARIO, null, buffet);
+        Decoracao decoracao = new Decoracao(1, "Minimalista", "abc", tipoEvento, buffet);
         Endereco endereco = new Endereco(780000000L, "rua 1", "1", "Buffet", "Consolação", "São Paulo", "SP", "06123181", buffet);
 
         Orcamento orcamento = new Orcamento(1, LocalDate.now(), 50, "Confirmado", false,

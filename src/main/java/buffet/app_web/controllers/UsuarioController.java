@@ -107,11 +107,11 @@ public class UsuarioController {
                     )
             )
     })
-    @PostMapping
+    @PostMapping("/{buffetId}")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<UsuarioResponseDto> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto){
+    public ResponseEntity<UsuarioResponseDto> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto, @PathVariable Long buffetId){
         Usuario usuario = UsuarioMapper.toEntity(usuarioCriacaoDto);
-        Usuario usuarioSalvo = usuarioStrategy.salvar(usuario);
+        Usuario usuarioSalvo = usuarioStrategy.salvar(usuario, buffetId);
         UsuarioResponseDto usuarioResponseDto = UsuarioMapper.toResponseDto(usuarioSalvo);
 
         return created(null).body(usuarioResponseDto);
@@ -187,9 +187,9 @@ public class UsuarioController {
                     content = @Content()
             )
     })
-    @PostMapping("/login")
-    public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto) {
-        UsuarioTokenDto usuarioTokenDto = this.usuarioStrategy.autenticar(usuarioLoginDto);
+    @PostMapping("/login/{buffetId}")
+    public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto, @PathVariable Long buffetId) {
+        UsuarioTokenDto usuarioTokenDto = this.usuarioStrategy.autenticar(usuarioLoginDto, buffetId);
 
         return ResponseEntity.status(200).body(usuarioTokenDto);
     }

@@ -20,4 +20,6 @@ public class Decoracao {
     private String foto;
     @ManyToOne
     private TipoEvento tipoEvento;
+    @ManyToOne
+    private Buffet buffet;
 }

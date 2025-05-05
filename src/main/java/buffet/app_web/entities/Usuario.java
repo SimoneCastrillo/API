@@ -22,4 +22,6 @@ public class Usuario {
     private UserRole role;
     @Column(columnDefinition = "TEXT")
     private String foto;
+    @ManyToOne
+    private Buffet buffet;
 }

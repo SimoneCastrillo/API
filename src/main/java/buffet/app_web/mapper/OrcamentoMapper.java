@@ -105,6 +105,7 @@ public class OrcamentoMapper {
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
                 .telefone(usuario.getTelefone())
+                .buffetId(usuario.getBuffet().getId())
                 .build();
 
         OrcamentoResponseDto.DecoracaoDto decoracaoDto = null;

@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class TipoEventoRequestDto {
     @NotBlank
     private String nome;
+    private Long buffetId;
 }

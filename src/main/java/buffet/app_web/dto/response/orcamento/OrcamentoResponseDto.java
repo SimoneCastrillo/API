@@ -50,6 +50,7 @@ public class OrcamentoResponseDto {
         private String nome;
         private String email;
         private String telefone;
+        private Long buffetId;
     }
 
     @Data

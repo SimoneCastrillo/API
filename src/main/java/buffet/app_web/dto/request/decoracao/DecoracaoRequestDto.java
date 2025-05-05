@@ -20,4 +20,8 @@ public class DecoracaoRequestDto {
     @NotNull
     @Positive
     private Integer tipoEventoId;
+
+    @NotNull
+    @Positive
+    private Long buffetId;
 }

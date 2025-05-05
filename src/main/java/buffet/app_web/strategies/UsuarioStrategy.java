@@ -10,10 +10,10 @@ import java.util.Optional;
 public interface UsuarioStrategy {
     List<Usuario> listarTodos();
     Usuario buscarPorId(Integer id);
-    Usuario salvar(Usuario usuario);
+    Usuario salvar(Usuario usuario, Long buffetId);
     Usuario atualizar(Usuario usuario);
     void deletar(Integer id);
-    UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto);
+    UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto, Long buffetId);
     void enviarCodigo(String email);
     Usuario alterarSenha(String email, String novaSenha, String novaSenhaConfirmacao);
     void validar(String email, String codigoInserido);
