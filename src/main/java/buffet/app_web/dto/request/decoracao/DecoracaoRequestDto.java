@@ -13,11 +13,5 @@ import org.springframework.web.multipart.MultipartFile;
 public class DecoracaoRequestDto {
     @NotBlank
     private String nome;
-
-
     private MultipartFile foto;
-
-    @NotNull
-    @Positive
-    private Integer tipoEventoId;
 }

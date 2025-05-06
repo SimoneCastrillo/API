@@ -119,9 +119,11 @@ public class OrcamentoController {
         Integer tipoEventoId = orcamentoConfirmacaoDto.getTipoEventoId();
         Integer usuarioId = orcamentoConfirmacaoDto.getUsuarioId();
         Integer decoracaoId = orcamentoConfirmacaoDto.getDecoracaoId();
+        Long buffetId = orcamentoConfirmacaoDto.getBuffetId();
+        Long enderecoId = orcamentoConfirmacaoDto.getEnderecoId();
 
         Orcamento orcamento = orcamentoStrategy.salvar(
-                OrcamentoMapper.toEntity(orcamentoConfirmacaoDto), tipoEventoId, usuarioId, decoracaoId);
+                OrcamentoMapper.toEntity(orcamentoConfirmacaoDto), tipoEventoId, usuarioId, decoracaoId, buffetId, enderecoId);
         OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamento);
 
         return created(null).body(responseDto);
@@ -151,6 +153,8 @@ public class OrcamentoController {
         Integer tipoEventoId = orcamentoConfirmacaoDto.getTipoEventoId();
         Integer usuarioId = orcamentoConfirmacaoDto.getUsuarioId();
         Integer decoracaoId = orcamentoConfirmacaoDto.getDecoracaoId();
+        Long buffetId = orcamentoConfirmacaoDto.getBuffetId();
+        Long enderecoId = orcamentoConfirmacaoDto.getEnderecoId();
 
         Orcamento orcamentoBusca = orcamentoStrategy.buscarPorId(id);
 
@@ -159,7 +163,7 @@ public class OrcamentoController {
         orcamento.setGoogleEventoId(orcamentoBusca.getGoogleEventoId());
         orcamento.setStatus(orcamentoBusca.getStatus());
 
-        Orcamento orcamentoSalvo = orcamentoStrategy.atualizar(orcamento, tipoEventoId, usuarioId, decoracaoId, authentication);
+        Orcamento orcamentoSalvo = orcamentoStrategy.atualizar(orcamento, tipoEventoId, usuarioId, decoracaoId, buffetId, enderecoId, authentication);
 
         OrcamentoResponseDto responseDto = OrcamentoMapper.toResponseDto(orcamentoSalvo);
 

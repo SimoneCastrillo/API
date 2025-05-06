@@ -19,4 +19,6 @@ public class Avaliacao {
     private TipoEvento tipoEvento;
     @Column(columnDefinition = "TEXT")
     private String foto;
+    @ManyToOne
+    private Buffet buffet;
 }

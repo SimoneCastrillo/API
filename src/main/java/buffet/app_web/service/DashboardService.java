@@ -14,48 +14,48 @@ public class DashboardService implements DashboardStrategy {
     @Autowired
     OrcamentoRepository orcamentoRepository;
 
-    public List<TipoEventoContagemDto> countOrcamentosByTipoEvento() {
-        return orcamentoRepository.countOrcamentosByTipoEvento();
+    public List<TipoEventoContagemDto> countOrcamentosByTipoEvento(Long buffetId) {
+        return orcamentoRepository.countOrcamentosByTipoEvento(buffetId);
     }
 
-    public ResumoFinanceiroDto getResumoFinanceiroMensal() {
-        return orcamentoRepository.getResumoFinanceiroMensal(LocalDate.now());
+    public ResumoFinanceiroDto getResumoFinanceiroMensal(Long buffetId) {
+        return orcamentoRepository.getResumoFinanceiroMensal(buffetId, LocalDate.now());
     }
 
-    public Double getPercentualEventosCancelados() {
-        return orcamentoRepository.getPercentualEventosCancelados();
+    public Double getPercentualEventosCancelados(Long buffetId) {
+        return orcamentoRepository.getPercentualEventosCancelados(buffetId);
     }
 
-    public List<TopEventoDto> findTop3ByLucro() {
-        return orcamentoRepository.findTop3ByLucro();
+    public List<TopEventoDto> findTop3ByLucro(Long buffetId) {
+        return orcamentoRepository.findTop3ByLucro(buffetId);
 
     }
 
-    public List<TopEventoDto> findTop3ByDespesa() {
-        return orcamentoRepository.findTop3ByDespesa();
+    public List<TopEventoDto> findTop3ByDespesa(Long buffetId) {
+        return orcamentoRepository.findTop3ByDespesa(buffetId);
     }
 
-    public Double getFaturamentoMedioPorEvento() {
-        return orcamentoRepository.getFaturamentoMedioPorEvento();
+    public Double getFaturamentoMedioPorEvento(Long buffetId) {
+        return orcamentoRepository.getFaturamentoMedioPorEvento(buffetId);
     }
 
-    public List<FaturamentoDespesaTipoEventoDto> getFaturamentoEDespesaPorTipoEvento() {
-        return orcamentoRepository.getFaturamentoEDespesaPorTipoEvento();
+    public List<FaturamentoDespesaTipoEventoDto> getFaturamentoEDespesaPorTipoEvento(Long buffetId) {
+        return orcamentoRepository.getFaturamentoEDespesaPorTipoEvento(buffetId);
     }
 
-    public List<PopularidadeDecoracaoDto> getPopularidadeDecoracao() {
-        return orcamentoRepository.getPopularidadeDecoracao();
+    public List<PopularidadeDecoracaoDto> getPopularidadeDecoracao(Long buffetId) {
+        return orcamentoRepository.getPopularidadeDecoracao(buffetId);
     }
 
-    public List<LucroPorTipoEventoDto> obterLucroPorTipoEvento() {
-        return orcamentoRepository.calcularLucroPorTipoEvento();
+    public List<LucroPorTipoEventoDto> obterLucroPorTipoEvento(Long buffetId) {
+        return orcamentoRepository.calcularLucroPorTipoEvento(buffetId);
     }
 
-    public List<QuantidadeOrcamentosPorMesDto> obterQuantidadeOrcamentosPorMes() {
-        return orcamentoRepository.calcularQuantidadeOrcamentosPorMes();
+    public List<QuantidadeOrcamentosPorMesDto> obterQuantidadeOrcamentosPorMes(Long buffetId) {
+        return orcamentoRepository.calcularQuantidadeOrcamentosPorMes(buffetId);
     }
 
-    public List<FaturamentoDespesaMesDto> getFaturamentoEDespesaPorMes() {
-        return orcamentoRepository.getFaturamentoEDespesaPorMes();
+    public List<FaturamentoDespesaMesDto> getFaturamentoEDespesaPorMes(Long buffetId) {
+        return orcamentoRepository.getFaturamentoEDespesaPorMes(buffetId);
     }
 }

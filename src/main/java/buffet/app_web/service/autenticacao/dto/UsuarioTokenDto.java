@@ -19,6 +19,7 @@ public class UsuarioTokenDto {
     private String token;
 
     private String foto;
+    private Long buffetId;
 
     public long getId() {
         return id;
@@ -82,5 +83,13 @@ public class UsuarioTokenDto {
 
     public void setFoto(String foto) {
         this.foto = foto;
+    }
+
+    public Long getBuffetId() {
+        return buffetId;
+    }
+
+    public void setBuffetId(Long buffetId) {
+        this.buffetId = buffetId;
     }
 }

@@ -15,4 +15,5 @@ public class UsuarioPorIdResponseDto {
     private Integer qtdOrcamento;
     private UserRole role;
     private String foto;
+    private Long buffetId;
 }

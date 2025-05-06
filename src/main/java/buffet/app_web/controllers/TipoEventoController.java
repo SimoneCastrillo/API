@@ -2,6 +2,7 @@ package buffet.app_web.controllers;
 
 import buffet.app_web.dto.request.tipoevento.TipoEventoRequestDto;
 import buffet.app_web.dto.response.tipoevento.TipoEventoResponseDto;
+import buffet.app_web.entities.Buffet;
 import buffet.app_web.entities.TipoEvento;
 import buffet.app_web.mapper.TipoEventoMapper;
 import buffet.app_web.strategies.TipoEventoStrategy;
@@ -46,13 +47,13 @@ public class TipoEventoController {
             )
     })
     @GetMapping
-    public ResponseEntity<List<TipoEventoResponseDto>> listarTodos(){
-        if (tipoEventoStrategy.listarTodos().isEmpty()){
+    public ResponseEntity<List<TipoEventoResponseDto>> listarTodos(Long buffetId){
+        if (tipoEventoStrategy.listarTodos(buffetId).isEmpty()){
             return noContent().build();
         }
 
         List<TipoEventoResponseDto> listDto =
-                tipoEventoStrategy.listarTodos().stream().map(TipoEventoMapper::toResponseDto).toList();
+                tipoEventoStrategy.listarTodos(buffetId).stream().map(TipoEventoMapper::toResponseDto).toList();
 
         return ok(listDto);
     }
@@ -94,13 +95,12 @@ public class TipoEventoController {
     })
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
-    public ResponseEntity<TipoEventoResponseDto> criar(@RequestBody @Valid TipoEventoRequestDto tipoEventoRequestDto){
-        TipoEvento tipoEventoSalvo = tipoEventoStrategy.salvar(TipoEventoMapper.toEntity(tipoEventoRequestDto));
+    public ResponseEntity<TipoEventoResponseDto> criar(@RequestBody @Valid TipoEventoRequestDto tipoEventoRequestDto, Long buffetId){
+        TipoEvento tipoEventoSalvo = tipoEventoStrategy.salvar(TipoEventoMapper.toEntity(tipoEventoRequestDto), buffetId);
         TipoEventoResponseDto tipoEventoResponseDto = TipoEventoMapper.toResponseDto(tipoEventoSalvo);
 
         return created(null).body(tipoEventoResponseDto);
     }
-
     @Operation(summary = "Atualizar um tipo de evento", description = """
             # Atualizar tipo de evento
             ---
@@ -119,12 +119,13 @@ public class TipoEventoController {
     })
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<TipoEventoResponseDto> atualizar(@PathVariable int id, @RequestBody @Valid TipoEventoRequestDto tipoEventoRequestDto){
+    public ResponseEntity<TipoEventoResponseDto> atualizar(@PathVariable int id, @RequestBody @Valid TipoEventoRequestDto tipoEventoRequestDto, Long buffetId){
         tipoEventoStrategy.buscarPorId(id);
 
         TipoEvento tipoEvento = TipoEventoMapper.toEntity(tipoEventoRequestDto);
         tipoEvento.setId(id);
-        TipoEvento tipoEventoSalvo = tipoEventoStrategy.salvar(tipoEvento);
+
+        TipoEvento tipoEventoSalvo = tipoEventoStrategy.salvar(tipoEvento, buffetId);
         TipoEventoResponseDto tipoEventoResponseDto = TipoEventoMapper.toResponseDto(tipoEventoSalvo);
 
         return ok(tipoEventoResponseDto);

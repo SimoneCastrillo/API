@@ -4,6 +4,7 @@ import buffet.app_web.dto.response.decoracao.DecoracaoResponseDto;
 import buffet.app_web.entities.Decoracao;
 import buffet.app_web.entities.TipoEvento;
 import buffet.app_web.entities.Usuario;
+import buffet.app_web.enums.Plano;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Max;
@@ -32,6 +33,8 @@ public class OrcamentoResponseDto {
     private TipoEventoDto tipoEvento;
     private UsuarioDto usuario;
     private DecoracaoDto decoracao;
+    private BuffetDto buffet;
+    private EnderecoDto endereco;
 
     @Data
     @Builder
@@ -42,10 +45,12 @@ public class OrcamentoResponseDto {
 
     @Data
     @Builder
-    public static class UsuarioDto{private Integer id;
+    public static class UsuarioDto{
+        private Integer id;
         private String nome;
         private String email;
         private String telefone;
+        private Long buffetId;
     }
 
     @Data
@@ -54,5 +59,32 @@ public class OrcamentoResponseDto {
         private Integer id;
         private String nome;
         private DecoracaoResponseDto.TipoEventoDto tipoEvento;
+    }
+
+    @Data
+    @Builder
+    public static class BuffetDto {
+        private Long id;
+        private String imagem;
+        private String nome;
+        private String descricao;
+        private String email;
+        private String urlSite;
+        private String telefone;
+        private Plano plano;
+    }
+
+    @Data
+    @Builder
+    public static class EnderecoDto {
+        private Long id;
+        private String rua;
+        private String numero;
+        private String complemento;
+        private String bairro;
+        private String cidade;
+        private String estado;
+        private String cep;
+        private Long buffetId;
     }
 }
