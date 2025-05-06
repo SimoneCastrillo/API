@@ -3,6 +3,7 @@ package buffet.app_web.controllers;
 import buffet.app_web.dto.request.usuario.*;
 import buffet.app_web.dto.response.usuario.UsuarioPorIdResponseDto;
 import buffet.app_web.dto.response.usuario.UsuarioResponseDto;
+import buffet.app_web.entities.Buffet;
 import buffet.app_web.entities.Usuario;
 import buffet.app_web.enums.UserRole;
 import buffet.app_web.mapper.UsuarioMapper;
@@ -11,6 +12,7 @@ import buffet.app_web.service.OrcamentoService;
 import buffet.app_web.service.UsuarioService;
 import buffet.app_web.service.autenticacao.dto.UsuarioLoginDto;
 import buffet.app_web.service.autenticacao.dto.UsuarioTokenDto;
+import buffet.app_web.strategies.BuffetStrategy;
 import buffet.app_web.strategies.UsuarioStrategy;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -36,6 +38,8 @@ import static org.springframework.http.ResponseEntity.*;
 public class UsuarioController {
     @Autowired
     private UsuarioStrategy usuarioStrategy;
+    @Autowired
+    private BuffetStrategy buffetStrategy;
     @Autowired
     private OrcamentoService orcamentoService;
 
@@ -136,15 +140,14 @@ public class UsuarioController {
 
     @PatchMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UsuarioResponseDto> atualizar(@PathVariable int id, @ModelAttribute @Valid UsuarioUpdateDto usuarioUpdateDto){
-        usuarioStrategy.buscarPorId(id);
+        Usuario usuarioBusca = usuarioStrategy.buscarPorId(id);
         String senha = usuarioStrategy.buscarPorId(id).getSenha();
         UserRole userRole = usuarioStrategy.buscarPorId(id).getRole();
-
         Usuario usuario = UsuarioMapper.toEntity(usuarioUpdateDto);
         usuario.setId(id);
         usuario.setSenha(senha);
         usuario.setRole(userRole);
-
+        usuario.setBuffet(usuarioBusca.getBuffet());
         Usuario usuarioSalvo = usuarioStrategy.atualizar(usuario);
         UsuarioResponseDto usuarioResponseDto = UsuarioMapper.toResponseDto(usuarioSalvo);
 

@@ -101,7 +101,6 @@ public class TipoEventoController {
 
         return created(null).body(tipoEventoResponseDto);
     }
-
     @Operation(summary = "Atualizar um tipo de evento", description = """
             # Atualizar tipo de evento
             ---
