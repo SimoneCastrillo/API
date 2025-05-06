@@ -1,9 +1,6 @@
 services:
   app:
-    image: app
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: giuliacarmona/app:latest //puxa image do dockerhub
     ports:
       - "8080:8080"
     env_file:
@@ -15,7 +12,9 @@ services:
       - mynetwork
 
   db:
-    image: postgres:14
+    image: giuliacarmona/postgres:14 // puxa image do dockerhub
+    volumes:
+      - db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: buffet_user
       POSTGRES_PASSWORD: password
