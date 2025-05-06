@@ -12,6 +12,7 @@ import buffet.app_web.strategies.UsuarioStrategy;
 import buffet.app_web.util.email.ConstroiAssuntosEmail;
 import buffet.app_web.util.email.ConstroiMensagensEmail;
 import buffet.app_web.util.email.GeradorCodigoVerificacao;
+import jakarta.mail.MessagingException;
 import org.hibernate.dialect.function.ListaggStringAggEmulation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -122,12 +123,16 @@ public class UsuarioService implements UsuarioStrategy {
 
         String codigo = GeradorCodigoVerificacao.gerarCodigoVerificacao();
         GeradorCodigoVerificacao.armazenarCodigo(email, codigo);
-
-        emailService.enviarCodigoVerificacao(
-                email,
-                ConstroiAssuntosEmail.construirAssuntoCodigoVerficacao(),
-                ConstroiMensagensEmail.construirMensagemCodigo(codigo)
-        );
+        try {
+            emailService.enviarCodigoVerificacao(
+                    email,
+                    ConstroiAssuntosEmail.construirAssuntoCodigoVerficacao(),
+                    ConstroiMensagensEmail.construirMensagemCodigo(codigo)
+            );
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao enviar e-mail HTML", e);
+        }
     }
 
     public void validar(String email, String codigoInserido){

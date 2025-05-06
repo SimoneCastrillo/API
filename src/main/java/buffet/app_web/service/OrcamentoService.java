@@ -8,6 +8,7 @@ import buffet.app_web.util.FilaObj;
 import buffet.app_web.util.PilhaObj;
 import buffet.app_web.util.email.ConstroiAssuntosEmail;
 import buffet.app_web.util.email.ConstroiMensagensEmail;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -76,11 +77,17 @@ public class OrcamentoService implements OrcamentoStrategy {
         orcamento.setEndereco(endereco);
 
         googleService.criarEvento(orcamento);
-        emailService.enviarEmail(
-                orcamento.getUsuario().getEmail(),
-                ConstroiAssuntosEmail.construirAssuntoOrcamentoCriado(),
-                ConstroiMensagensEmail.construirMensagemOrcamentoCriado(orcamento)
-                );
+        try {
+            emailService.enviarEmailHtml(
+                    orcamento.getUsuario().getEmail(),
+                    ConstroiAssuntosEmail.construirAssuntoOrcamentoCriado(),
+                    ConstroiMensagensEmail.construirMensagemOrcamentoCriado(orcamento)
+            );
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao enviar e-mail HTML", e);
+        }
+
         return orcamentoRepository.save(orcamento);
     }
 
@@ -153,11 +160,17 @@ public class OrcamentoService implements OrcamentoStrategy {
         orcamento.setId(id);
         orcamento.setCancelado(true);
         orcamento.setStatus("CANCELADO");
-        emailService.enviarEmail(
-                orcamento.getUsuario().getEmail(),
-                ConstroiAssuntosEmail.construirAssuntoOrcamentoCancelado(),
-                ConstroiMensagensEmail.construirMensagemOrcamentoCancelado(orcamento)
-        );
+        try {
+            emailService.enviarEmailHtml(
+                    orcamento.getUsuario().getEmail(),
+                    ConstroiAssuntosEmail.construirAssuntoOrcamentoCancelado(),
+                    ConstroiMensagensEmail.construirMensagemOrcamentoCancelado(orcamento)
+            );
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao enviar e-mail HTML", e);
+        }
+
         return orcamentoRepository.save(orcamento);
     }
 
@@ -225,11 +238,17 @@ public class OrcamentoService implements OrcamentoStrategy {
             throw new RuntimeException(e);
         }
 
-        emailService.enviarEmail(
-                orcamento.getUsuario().getEmail(),
-                ConstroiAssuntosEmail.construirAssuntoOrcamentoConfirmado(),
-                ConstroiMensagensEmail.construirMensagemOrcamentoConfirmado(orcamento)
-        );
+        try {
+            emailService.enviarEmailHtml(
+                    orcamento.getUsuario().getEmail(),
+                    ConstroiAssuntosEmail.construirAssuntoOrcamentoConfirmado(),
+                    ConstroiMensagensEmail.construirMensagemOrcamentoConfirmado(orcamento)
+            );
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao enviar e-mail HTML", e);
+        }
+
         return orcamentoRepository.save(orcamento);
     }
 
@@ -276,8 +295,8 @@ public class OrcamentoService implements OrcamentoStrategy {
         return daysDifference == 7;
     }
 
-    public List<TipoEventoContagemDto> countOrcamentosByTipoEvento() {
-        return orcamentoRepository.countOrcamentosByTipoEvento();
+    public List<TipoEventoContagemDto> countOrcamentosByTipoEvento(Long buffetId) {
+        return orcamentoRepository.countOrcamentosByTipoEvento(buffetId);
     }
 
     private Orcamento clonarOrcamento(Orcamento orcamento) {
