@@ -56,6 +56,7 @@ public class OrcamentoMapper {
         Usuario usuario = orcamento.getUsuario();
         Decoracao decoracao = orcamento.getDecoracao();
         Buffet buffet = orcamento.getBuffet();
+
         Endereco endereco = orcamento.getEndereco();
 
         DecoracaoResponseDto.TipoEventoDto tipoEventoDecoracaoDto = null;

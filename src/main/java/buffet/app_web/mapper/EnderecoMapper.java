@@ -18,6 +18,7 @@ public class EnderecoMapper {
                 .nome(buffet.getNome())
                 .email(buffet.getEmail())
                 .imagem(buffet.getImagem())
+                .descricao(buffet.getDescricao())
                 .plano(buffet.getPlano())
                 .urlSite(buffet.getUrlSite())
                 .telefone(buffet.getTelefone())

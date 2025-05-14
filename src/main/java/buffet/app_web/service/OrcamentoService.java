@@ -217,7 +217,7 @@ public class OrcamentoService implements OrcamentoStrategy {
     }
 
     @Override
-    public Orcamento confirmarDadosDoEvento(Orcamento orcamento, Integer tipoEventoId, Integer decoracaoId){
+    public Orcamento confirmarDadosDoEvento(Orcamento orcamento, Integer tipoEventoId, Integer decoracaoId, Long buffetId, Long enderecoId){
         if (orcamento.getStatus().equals("CANCELADO")){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -228,9 +228,13 @@ public class OrcamentoService implements OrcamentoStrategy {
         }
 
         TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
+        Buffet buffet = buffetService.buscarPorId(buffetId);
+        Endereco endereco = enderecoService.buscarPorId(enderecoId);
 
+        orcamento.setBuffet(buffet);
         orcamento.setTipoEvento(tipoEvento);
         orcamento.setDecoracao(decoracao);
+        orcamento.setEndereco(endereco);
 
         try {
             googleService.atualizarEvento(System.getenv("GOOGLE_CALENDAR_ID"), orcamento);
