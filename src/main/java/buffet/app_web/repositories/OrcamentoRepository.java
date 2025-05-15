@@ -32,10 +32,12 @@ public interface OrcamentoRepository extends JpaRepository<Orcamento, Integer> {
     @Query("SELECT new buffet.app_web.dto.response.dashboard.ResumoFinanceiroDto(" +
             "SUM(o.lucro), SUM(o.faturamento), SUM(o.despesa)) " +
             "FROM Orcamento o " +
-            "WHERE MONTH(o.dataEvento) = MONTH(:dataAtual) AND YEAR(o.dataEvento) = YEAR(:dataAtual) " +
+            "WHERE o.dataEvento BETWEEN :inicioMes AND :fimMes " +
             "AND o.buffet.id = :buffetId " +
             "AND o.status IN ('CONFIRMADO', 'FINALIZADO')")
-    ResumoFinanceiroDto getResumoFinanceiroMensal(@Param("buffetId") Long buffetId, @Param("dataAtual") LocalDate dataAtual);
+    ResumoFinanceiroDto getResumoFinanceiroMensal(@Param("buffetId") Long buffetId,
+                                                  @Param("inicioMes") LocalDate inicioMes,
+                                                  @Param("fimMes") LocalDate fimMes);
 
     @Query("SELECT new buffet.app_web.dto.response.dashboard.TopEventoDto(o.tipoEvento.nome, SUM(o.lucro)) " +
             "FROM Orcamento o " +

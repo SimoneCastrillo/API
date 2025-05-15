@@ -19,7 +19,10 @@ public class DashboardService implements DashboardStrategy {
     }
 
     public ResumoFinanceiroDto getResumoFinanceiroMensal(Long buffetId) {
-        return orcamentoRepository.getResumoFinanceiroMensal(buffetId, LocalDate.now());
+        LocalDate dataAtual = LocalDate.now();
+        LocalDate inicioMes = dataAtual.withDayOfMonth(1);
+        LocalDate fimMes = dataAtual.withDayOfMonth(dataAtual.lengthOfMonth());
+        return orcamentoRepository.getResumoFinanceiroMensal(buffetId, inicioMes, fimMes);
     }
 
     public Double getPercentualEventosCancelados(Long buffetId) {
