@@ -34,5 +34,6 @@ public class OrcamentoConfirmacaoDto {
     private Integer tipoEventoId;
     @Column(nullable = true)
     private Integer decoracaoId;
-
+    private Integer buffetId;
+    private Integer enderecoId;
 }

@@ -9,12 +9,12 @@ import java.util.List;
 public interface OrcamentoStrategy {
     List<Orcamento> listarTodos();
     Orcamento buscarPorId(Integer id);
-    Orcamento salvar(Orcamento item, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId);
-    Orcamento atualizar(Orcamento item, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Authentication authentication);
+    Orcamento salvar(Orcamento item, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Long buffetId, Long enderecoId);
+    Orcamento atualizar(Orcamento item, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Long buffetId, Long enderecoId, Authentication authentication);
     void deletar(Integer id);
     Orcamento cancelarEvento(int id, Authentication authentication);
     Orcamento confirmarEvento(int id);
-    Orcamento confirmarDadosDoEvento(Orcamento orcamento, Integer tipoEventoId, Integer decoracaoId);
+    Orcamento confirmarDadosDoEvento(Orcamento orcamento, Integer tipoEventoId, Integer decoracaoId, Long buffetId, Long enderecoId);
     List<Orcamento> findByUsuarioId(int id);
     void finalizarOrcamentosExpirados();
     Orcamento desfazerCancelamento(int id);

@@ -50,13 +50,13 @@ public class DecoracaoController {
             )
     })
     @GetMapping
-    public ResponseEntity<List<DecoracaoResponseDto>> listarTodos(){
-        if (decoracaoStrategy.listarTodos().isEmpty()){
+    public ResponseEntity<List<DecoracaoResponseDto>> listarTodos(Long buffetId){
+        if (decoracaoStrategy.listarTodos(buffetId).isEmpty()){
             return noContent().build();
         }
 
         List<DecoracaoResponseDto> listaDto =
-                decoracaoStrategy.listarTodos().stream().map(DecoracaoMapper::toResponseDto).toList();
+                decoracaoStrategy.listarTodos(buffetId).stream().map(DecoracaoMapper::toResponseDto).toList();
         return ok(listaDto);
     }
 
@@ -96,8 +96,8 @@ public class DecoracaoController {
     })
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<DecoracaoResponseDto> publicar(@ModelAttribute @Valid DecoracaoRequestDto decoracaoRequestDto, Integer tipoEventoId) {
-        Decoracao decoracao = decoracaoStrategy.salvar(DecoracaoMapper.toEntity(decoracaoRequestDto), tipoEventoId);
+    public ResponseEntity<DecoracaoResponseDto> publicar(@ModelAttribute @Valid DecoracaoRequestDto decoracaoRequestDto, Integer tipoEventoId, Long buffetId) {
+        Decoracao decoracao = decoracaoStrategy.salvar(DecoracaoMapper.toEntity(decoracaoRequestDto), tipoEventoId, buffetId);
         DecoracaoResponseDto decoracaoResponseDto = DecoracaoMapper.toResponseDto(decoracao);
         return ResponseEntity.ok(decoracaoResponseDto);
     }
@@ -120,12 +120,12 @@ public class DecoracaoController {
     })
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<DecoracaoResponseDto> atualizar(@ModelAttribute @Valid DecoracaoRequestDto decoracaoRequestDto, @PathVariable int id, Integer tipoEventoId){
+    public ResponseEntity<DecoracaoResponseDto> atualizar(@ModelAttribute @Valid DecoracaoRequestDto decoracaoRequestDto, @PathVariable int id, Integer tipoEventoId, Long buffetId){
         decoracaoStrategy.buscarPorId(id);
 
         Decoracao decoracao = DecoracaoMapper.toEntity(decoracaoRequestDto);
         decoracao.setId(id);
-        Decoracao decoracaoSalva = decoracaoStrategy.salvar(decoracao, tipoEventoId);
+        Decoracao decoracaoSalva = decoracaoStrategy.salvar(decoracao, tipoEventoId, buffetId);
 
         return ok(DecoracaoMapper.toResponseDto(decoracaoSalva));
     }

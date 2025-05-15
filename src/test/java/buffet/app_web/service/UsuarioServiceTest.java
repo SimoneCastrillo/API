@@ -1,7 +1,9 @@
 package buffet.app_web.service;
 
+import buffet.app_web.entities.Buffet;
 import buffet.app_web.entities.Usuario;
 import buffet.app_web.entities.Usuario;
+import buffet.app_web.enums.Plano;
 import buffet.app_web.enums.UserRole;
 import buffet.app_web.repositories.UsuarioRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -63,6 +65,8 @@ class UsuarioServiceTest {
     @DisplayName("Dado que, tenho algo no banco, retorna lista com tipo de evento")
     void buscarTodosListaCheia() {
         // GIVEN
+        Buffet buffet = new Buffet(7800000000L, "abc", "descricao", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+
         List<Usuario> usuarioss = List.of(
                 new Usuario(
                         1,
@@ -71,7 +75,8 @@ class UsuarioServiceTest {
                         "123456",
                         "40028922",
                         UserRole.USUARIO,
-                        null
+                        null,
+                        buffet
                 ));
 
         // WHEN
@@ -103,6 +108,8 @@ class UsuarioServiceTest {
     @DisplayName("Dado que, tenho um usuário pelo id, retorne corretamente")
     void buscaPorIdCorretamente() {
         // GIVEN
+        Buffet buffet = new Buffet(7800000000L, "abc", "descricao", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+
         Usuario usuariosEsperada = new Usuario(
                  1,
                  "Eduardo",
@@ -110,7 +117,8 @@ class UsuarioServiceTest {
                 "123456",
                 "40028922",
                 UserRole.USUARIO,
-                null
+                null,
+                buffet
         );
 
         // WHEN
@@ -150,6 +158,8 @@ class UsuarioServiceTest {
     @DisplayName("Dado que, o usuário não existe, salva corretamente")
     void salvarUsuarioCorretamente() {
         // GIVEN
+        Buffet buffet = new Buffet(7800000000L, "abc", "descricao", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+
         Usuario usuarios = new Usuario(
                 1,
                 "Eduardo",
@@ -157,7 +167,8 @@ class UsuarioServiceTest {
                 "123456",
                 "40028922",
                 UserRole.USUARIO,
-                null
+                null,
+                buffet
         );
 
         // WHEN
@@ -173,7 +184,7 @@ class UsuarioServiceTest {
                 .thenReturn("");
 
         // THEN
-        Usuario resultado = usuarioService.salvar(usuarios);
+        Usuario resultado = usuarioService.salvar(usuarios, buffet.getId());
 
         // ASSERT
         assertNotNull(resultado);

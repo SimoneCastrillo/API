@@ -37,6 +37,10 @@ public class Orcamento {
     @ManyToOne
     @JoinColumn(name = "decoracao_id", nullable = true)
     private Decoracao decoracao;
+    @ManyToOne
+    private Buffet buffet;
+    @ManyToOne
+    private Endereco endereco;
 
     public void finalizarSeDataPassou() {
         if (this.status.equals("CONFIRMADO") && this.dataEvento.isBefore(LocalDate.now())) {
