@@ -120,6 +120,16 @@ public class UsuarioController {
 
         return created(null).body(usuarioResponseDto);
     }
+    @PostMapping()
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Usuario> criarNexora(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto){
+        Usuario usuario = UsuarioMapper.toEntity(usuarioCriacaoDto);
+        Usuario usuarioSalvo = usuarioStrategy.salvar(usuario);
+
+
+        return created(null).body(usuarioSalvo);
+    }
+
 
     @Operation(summary = "Atualizar um usuário", description = """
             # Atualizar usuário
@@ -193,6 +203,12 @@ public class UsuarioController {
     @PostMapping("/login/{buffetId}")
     public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto, @PathVariable Long buffetId) {
         UsuarioTokenDto usuarioTokenDto = this.usuarioStrategy.autenticar(usuarioLoginDto, buffetId);
+
+        return ResponseEntity.status(200).body(usuarioTokenDto);
+    }
+    @PostMapping("/login/admin-nexora")
+    public ResponseEntity<UsuarioTokenDto> loginNexora(@RequestBody UsuarioLoginDto usuarioLoginDto) {
+        UsuarioTokenDto usuarioTokenDto = this.usuarioStrategy.autenticar(usuarioLoginDto);
 
         return ResponseEntity.status(200).body(usuarioTokenDto);
     }

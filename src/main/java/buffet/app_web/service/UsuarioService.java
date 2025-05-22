@@ -3,6 +3,7 @@ package buffet.app_web.service;
 import buffet.app_web.configuration.security.jwt.GerenciadorTokenJwt;
 import buffet.app_web.entities.Buffet;
 import buffet.app_web.entities.Usuario;
+import buffet.app_web.enums.UserRole;
 import buffet.app_web.mapper.UsuarioMapper;
 import buffet.app_web.repositories.OrcamentoRepository;
 import buffet.app_web.repositories.UsuarioRepository;
@@ -68,6 +69,17 @@ public class UsuarioService implements UsuarioStrategy {
         usuario.setBuffet(buffet);
         return  usuarioRepository.save(usuario);
     }
+    public Usuario salvar(Usuario usuario){
+
+        if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        String senhaCriptografada = passwordEncoder.encode(usuario.getSenha());
+        usuario.setSenha(senhaCriptografada);
+        usuario.setRole(UserRole.NEXORA_ADMIN);
+        return  usuarioRepository.save(usuario);
+    }
 
     public Usuario buscarPorEmailEBuffet(String email, Long buffetId) {
         return usuarioRepository.findByEmailAndBuffetId(email, buffetId)
@@ -93,6 +105,25 @@ public class UsuarioService implements UsuarioStrategy {
         Usuario usuarioAutenticado =
                 usuarioRepository
                         .findByEmailAndBuffetId(usuarioLoginDto.getEmail(), buffetId)
+                        .orElseThrow(() -> new ResponseStatusException(404, "Email do usuário não cadastrado", null));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        final String token = gerenciadorTokenJwt.generateToken(authentication);
+        Integer qtdOrcamento = orcamentoRepository.countByUsuarioId(usuarioAutenticado.getId());
+
+        return UsuarioMapper.of(usuarioAutenticado, token, qtdOrcamento);
+    }
+    public UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto) {
+
+        final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
+                usuarioLoginDto.getEmail(), usuarioLoginDto.getSenha());
+
+        final Authentication authentication = this.authenticationManager.authenticate(credentials);
+
+        Usuario usuarioAutenticado =
+                usuarioRepository
+                        .findByEmail(usuarioLoginDto.getEmail())
                         .orElseThrow(() -> new ResponseStatusException(404, "Email do usuário não cadastrado", null));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
