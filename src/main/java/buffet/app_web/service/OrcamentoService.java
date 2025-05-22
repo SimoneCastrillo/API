@@ -1,16 +1,14 @@
 package buffet.app_web.service;
 
 import buffet.app_web.dto.response.dashboard.TipoEventoContagemDto;
-import buffet.app_web.entities.Decoracao;
-import buffet.app_web.entities.Orcamento;
-import buffet.app_web.entities.TipoEvento;
-import buffet.app_web.entities.Usuario;
+import buffet.app_web.entities.*;
 import buffet.app_web.repositories.OrcamentoRepository;
 import buffet.app_web.strategies.OrcamentoStrategy;
 import buffet.app_web.util.FilaObj;
 import buffet.app_web.util.PilhaObj;
 import buffet.app_web.util.email.ConstroiAssuntosEmail;
 import buffet.app_web.util.email.ConstroiMensagensEmail;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -35,6 +33,10 @@ public class OrcamentoService implements OrcamentoStrategy {
     @Autowired
     private DecoracaoService decoracaoService;
     @Autowired
+    private BuffetService buffetService;
+    @Autowired
+    private EnderecoService enderecoService;
+    @Autowired
     private GoogleService googleService;
     @Autowired
     private EmailService emailService;
@@ -53,7 +55,7 @@ public class OrcamentoService implements OrcamentoStrategy {
     }
 
     @Override
-    public Orcamento salvar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId) {
+    public Orcamento salvar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Long buffetId, Long enderecoId) {
         Decoracao decoracao = null;
         if (decoracaoId != null) {
             decoracao = decoracaoService.buscarPorId(decoracaoId);
@@ -61,21 +63,35 @@ public class OrcamentoService implements OrcamentoStrategy {
 
         TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
         Usuario usuario = usuarioService.buscarPorId(usuarioId);
+        Buffet buffet = buffetService.buscarPorId(buffetId);
+        Endereco endereco = enderecoService.buscarPorId(enderecoId);
+
+        if (!endereco.getBuffet().getId().equals(buffetId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Este endereço não pertence ao buffet selecionado");
+        }
 
         orcamento.setTipoEvento(tipoEvento);
         orcamento.setUsuario(usuario);
         orcamento.setDecoracao(decoracao);
+        orcamento.setBuffet(buffet);
+        orcamento.setEndereco(endereco);
 
         googleService.criarEvento(orcamento);
-        emailService.enviarEmail(
-                orcamento.getUsuario().getEmail(),
-                ConstroiAssuntosEmail.construirAssuntoOrcamentoCriado(),
-                ConstroiMensagensEmail.construirMensagemOrcamentoCriado(orcamento)
-                );
+        try {
+            emailService.enviarEmailHtml(
+                    orcamento.getUsuario().getEmail(),
+                    ConstroiAssuntosEmail.construirAssuntoOrcamentoCriado(),
+                    ConstroiMensagensEmail.construirMensagemOrcamentoCriado(orcamento)
+            );
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao enviar e-mail HTML", e);
+        }
+
         return orcamentoRepository.save(orcamento);
     }
 
-    public Orcamento atualizar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Authentication authentication) {
+    public Orcamento atualizar(Orcamento orcamento, Integer tipoEventoId, Integer usuarioId, Integer decoracaoId, Long buffetId, Long enderecoId, Authentication authentication) {
         if (orcamento.getStatus().equals("CANCELADO")){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -89,10 +105,18 @@ public class OrcamentoService implements OrcamentoStrategy {
 
         TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
         Usuario usuario = usuarioService.buscarPorId(usuarioId);
+        Buffet buffet = buffetService.buscarPorId(buffetId);
+        Endereco endereco = enderecoService.buscarPorId(enderecoId);
+
+        if (!endereco.getBuffet().getId().equals(buffetId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Este endereço não pertence ao buffet selecionado");
+        }
 
         orcamento.setTipoEvento(tipoEvento);
         orcamento.setUsuario(usuario);
         orcamento.setDecoracao(decoracao);
+        orcamento.setBuffet(buffet);
+        orcamento.setEndereco(endereco);
 
         try {
             googleService.atualizarEvento(System.getenv("GOOGLE_CALENDAR_ID"), orcamento);
@@ -136,11 +160,17 @@ public class OrcamentoService implements OrcamentoStrategy {
         orcamento.setId(id);
         orcamento.setCancelado(true);
         orcamento.setStatus("CANCELADO");
-        emailService.enviarEmail(
-                orcamento.getUsuario().getEmail(),
-                ConstroiAssuntosEmail.construirAssuntoOrcamentoCancelado(),
-                ConstroiMensagensEmail.construirMensagemOrcamentoCancelado(orcamento)
-        );
+        try {
+            emailService.enviarEmailHtml(
+                    orcamento.getUsuario().getEmail(),
+                    ConstroiAssuntosEmail.construirAssuntoOrcamentoCancelado(),
+                    ConstroiMensagensEmail.construirMensagemOrcamentoCancelado(orcamento)
+            );
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao enviar e-mail HTML", e);
+        }
+
         return orcamentoRepository.save(orcamento);
     }
 
@@ -187,7 +217,7 @@ public class OrcamentoService implements OrcamentoStrategy {
     }
 
     @Override
-    public Orcamento confirmarDadosDoEvento(Orcamento orcamento, Integer tipoEventoId, Integer decoracaoId){
+    public Orcamento confirmarDadosDoEvento(Orcamento orcamento, Integer tipoEventoId, Integer decoracaoId, Long buffetId, Long enderecoId){
         if (orcamento.getStatus().equals("CANCELADO")){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -198,9 +228,13 @@ public class OrcamentoService implements OrcamentoStrategy {
         }
 
         TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
+        Buffet buffet = buffetService.buscarPorId(buffetId);
+        Endereco endereco = enderecoService.buscarPorId(enderecoId);
 
+        orcamento.setBuffet(buffet);
         orcamento.setTipoEvento(tipoEvento);
         orcamento.setDecoracao(decoracao);
+        orcamento.setEndereco(endereco);
 
         try {
             googleService.atualizarEvento(System.getenv("GOOGLE_CALENDAR_ID"), orcamento);
@@ -208,11 +242,17 @@ public class OrcamentoService implements OrcamentoStrategy {
             throw new RuntimeException(e);
         }
 
-        emailService.enviarEmail(
-                orcamento.getUsuario().getEmail(),
-                ConstroiAssuntosEmail.construirAssuntoOrcamentoConfirmado(),
-                ConstroiMensagensEmail.construirMensagemOrcamentoConfirmado(orcamento)
-        );
+        try {
+            emailService.enviarEmailHtml(
+                    orcamento.getUsuario().getEmail(),
+                    ConstroiAssuntosEmail.construirAssuntoOrcamentoConfirmado(),
+                    ConstroiMensagensEmail.construirMensagemOrcamentoConfirmado(orcamento)
+            );
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao enviar e-mail HTML", e);
+        }
+
         return orcamentoRepository.save(orcamento);
     }
 
@@ -259,8 +299,8 @@ public class OrcamentoService implements OrcamentoStrategy {
         return daysDifference == 7;
     }
 
-    public List<TipoEventoContagemDto> countOrcamentosByTipoEvento() {
-        return orcamentoRepository.countOrcamentosByTipoEvento();
+    public List<TipoEventoContagemDto> countOrcamentosByTipoEvento(Long buffetId) {
+        return orcamentoRepository.countOrcamentosByTipoEvento(buffetId);
     }
 
     private Orcamento clonarOrcamento(Orcamento orcamento) {
@@ -282,6 +322,7 @@ public class OrcamentoService implements OrcamentoStrategy {
         clone.setTipoEvento(orcamento.getTipoEvento());
         clone.setUsuario(orcamento.getUsuario());
         clone.setDecoracao(orcamento.getDecoracao());
+        clone.setBuffet(orcamento.getBuffet());
         return clone;
     }
 

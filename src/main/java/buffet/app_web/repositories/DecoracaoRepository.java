@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface DecoracaoRepository extends JpaRepository<Decoracao, Integer> {
     List<Decoracao> findByTipoEventoId(Integer tipoEventoId);
+    List<Decoracao> findByBuffetId(Long buffetId);
 }

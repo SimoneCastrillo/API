@@ -1,7 +1,9 @@
 package buffet.app_web.service;
 
 import buffet.app_web.entities.Avaliacao;
+import buffet.app_web.entities.Buffet;
 import buffet.app_web.entities.TipoEvento;
+import buffet.app_web.enums.Plano;
 import buffet.app_web.enums.UserRole;
 import buffet.app_web.repositories.AvaliacaoRepository;
 import buffet.app_web.repositories.TipoEventoRepository;
@@ -63,9 +65,13 @@ class AvaliacaoServiceTest {
     @DisplayName("Dado que, tenho algo no banco, retorna lista com tipo de evento")
     void buscarTodosListaCheia() {
         // GIVEN
+        Buffet buffet = new Buffet(7800000000L, "abc", "descricao", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+
+
         TipoEvento tiposEvento = new TipoEvento(
                 1,
-                "Rave"
+                "Rave",
+                buffet
         );
 
         List<Avaliacao> avaliacao = List.of(
@@ -74,7 +80,8 @@ class AvaliacaoServiceTest {
                 "Fernanda",
                 "Olá, tudo bem?",
                 tiposEvento,
-                null
+                null,
+                        buffet
                 ));
 
         // WHEN
@@ -106,17 +113,24 @@ class AvaliacaoServiceTest {
     @DisplayName("Dado que, tenho uma avaliação pelo id, retorne corretamente")
     void buscaPorIdCorretamente() {
         // GIVEN
+        Buffet buffet = new Buffet(7800000000L, "abc", "descricao", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+
+
         TipoEvento tiposEvento = new TipoEvento(
                 1,
-                "Rave"
+                "Rave",
+                buffet
         );
+
+
 
         Avaliacao avaliacao = new Avaliacao(
                 1,
                 "Fernanda",
                 "Olá, tudo bem?",
                 tiposEvento,
-                null
+                null,
+                buffet
         );
 
         // WHEN
@@ -156,9 +170,13 @@ class AvaliacaoServiceTest {
     @DisplayName("Dado que, a avaliação não existe, salva corretamente")
     void salvarAvaliacaoCorretamente() {
         // GIVEN
+        Buffet buffet = new Buffet(7800000000L, "abc", "descricao", "corinthians@gmail.com", "Corinthians", "www.corinthians.com", "1177616231", Plano.PREMIUM);
+
+
         TipoEvento tiposEvento = new TipoEvento(
                 1,
-                "Rave"
+                "Rave",
+                buffet
         );
 
         Avaliacao avaliacao = new Avaliacao(
@@ -166,7 +184,8 @@ class AvaliacaoServiceTest {
                 "Fernanda",
                 "Olá, tudo bem?",
                 tiposEvento,
-                null
+                null,
+                buffet
         );
 
         // WHEN

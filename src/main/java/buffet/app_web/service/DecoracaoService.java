@@ -1,5 +1,6 @@
 package buffet.app_web.service;
 
+import buffet.app_web.entities.Buffet;
 import buffet.app_web.entities.Decoracao;
 import buffet.app_web.entities.TipoEvento;
 import buffet.app_web.repositories.DecoracaoRepository;
@@ -18,9 +19,11 @@ public class DecoracaoService implements DecoracaoStrategy {
     private DecoracaoRepository decoracaoRepository;
     @Autowired
     private TipoEventoService tipoEventoService;
+    @Autowired
+    private BuffetService buffetService;
     @Override
-    public List<Decoracao> listarTodos() {
-        return decoracaoRepository.findAll();
+    public List<Decoracao> listarTodos(Long buffetId) {
+        return decoracaoRepository.findByBuffetId(buffetId);
     }
 
     @Override
@@ -29,9 +32,12 @@ public class DecoracaoService implements DecoracaoStrategy {
     }
 
     @Override
-    public Decoracao salvar(Decoracao decoracao, Integer tipoEventoId) {
+    public Decoracao salvar(Decoracao decoracao, Integer tipoEventoId, Long buffetId) {
+        Buffet buffet = buffetService.buscarPorId(buffetId);
         TipoEvento tipoEvento = tipoEventoService.buscarPorId(tipoEventoId);
+
         decoracao.setTipoEvento(tipoEvento);
+        decoracao.setBuffet(buffet);
 
         return decoracaoRepository.save(decoracao);
     }

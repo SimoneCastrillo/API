@@ -4,14 +4,16 @@ import buffet.app_web.dto.request.orcamento.OrcamentoConfirmacaoDto;
 import buffet.app_web.dto.request.orcamento.OrcamentoRequestDto;
 import buffet.app_web.dto.response.decoracao.DecoracaoResponseDto;
 import buffet.app_web.dto.response.orcamento.OrcamentoResponseDto;
-import buffet.app_web.entities.Decoracao;
-import buffet.app_web.entities.Orcamento;
-import buffet.app_web.entities.TipoEvento;
-import buffet.app_web.entities.Usuario;
+import buffet.app_web.entities.*;
 
 public class OrcamentoMapper {
     public static Orcamento toEntity(OrcamentoRequestDto dto){
         if (dto == null) return null;
+
+        Buffet buffet = Buffet
+                .builder()
+                .id(dto.getBuffetId())
+                .build();
 
         Orcamento orcamento = Orcamento
                 .builder()
@@ -53,6 +55,9 @@ public class OrcamentoMapper {
         TipoEvento tipoEvento = orcamento.getTipoEvento();
         Usuario usuario = orcamento.getUsuario();
         Decoracao decoracao = orcamento.getDecoracao();
+        Buffet buffet = orcamento.getBuffet();
+
+        Endereco endereco = orcamento.getEndereco();
 
         DecoracaoResponseDto.TipoEventoDto tipoEventoDecoracaoDto = null;
         if (decoracao != null) {
@@ -62,6 +67,32 @@ public class OrcamentoMapper {
                     .nome(decoracao.getTipoEvento().getNome())
                     .build();
         }
+
+        OrcamentoResponseDto.BuffetDto buffetDto = OrcamentoResponseDto.BuffetDto
+                .builder()
+                .id(buffet.getId())
+                .nome(buffet.getNome())
+                .email(buffet.getEmail())
+                .descricao(buffet.getDescricao())
+                .urlSite(buffet.getUrlSite())
+                .imagem(buffet.getImagem())
+                .telefone(buffet.getTelefone())
+                .plano(buffet.getPlano())
+                .build();
+
+        OrcamentoResponseDto.EnderecoDto enderecoDto = OrcamentoResponseDto.EnderecoDto
+                .builder()
+                .id(endereco.getId())
+                .rua(endereco.getRua())
+                .numero(endereco.getNumero())
+                .complemento(endereco.getComplemento())
+                .bairro(endereco.getBairro())
+                .cidade(endereco.getCidade())
+                .estado(endereco.getEstado())
+                .cep(endereco.getCep())
+                .buffetId(endereco.getBuffet().getId())
+                .build();
+
 
         OrcamentoResponseDto.TipoEventoDto tipoEventoDto = OrcamentoResponseDto.TipoEventoDto
                 .builder()
@@ -75,6 +106,7 @@ public class OrcamentoMapper {
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
                 .telefone(usuario.getTelefone())
+                .buffetId(usuario.getBuffet().getId())
                 .build();
 
         OrcamentoResponseDto.DecoracaoDto decoracaoDto = null;
@@ -106,6 +138,8 @@ public class OrcamentoMapper {
                 .tipoEvento(tipoEventoDto)
                 .usuario(usuarioDto)
                 .decoracao(decoracaoDto)
+                .buffet(buffetDto)
+                .endereco(enderecoDto)
                 .build();
 
         return dto;

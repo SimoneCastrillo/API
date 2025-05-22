@@ -2,6 +2,7 @@ package buffet.app_web.mapper;
 
 import buffet.app_web.dto.request.decoracao.DecoracaoRequestDto;
 import buffet.app_web.dto.response.decoracao.DecoracaoResponseDto;
+import buffet.app_web.entities.Buffet;
 import buffet.app_web.entities.Decoracao;
 import buffet.app_web.entities.TipoEvento;
 
@@ -12,7 +13,6 @@ public class DecoracaoMapper {
         if (dto == null) return null;
 
         String base64Image = null;
-
 
         if (dto.getFoto() != null && !dto.getFoto().isEmpty()) {
             try {
@@ -36,19 +36,34 @@ public class DecoracaoMapper {
         if (decoracao == null) return null;
 
         TipoEvento tipoEvento = decoracao.getTipoEvento();
+        Buffet buffet = decoracao.getBuffet();
 
-        DecoracaoResponseDto.TipoEventoDto dto = DecoracaoResponseDto.TipoEventoDto
+        DecoracaoResponseDto.TipoEventoDto tipoEventoDto = DecoracaoResponseDto.TipoEventoDto
                 .builder()
                 .id(tipoEvento.getId())
                 .nome(tipoEvento.getNome())
+                .build();
+
+        DecoracaoResponseDto.BuffetResponseDto buffetDto = DecoracaoResponseDto.BuffetResponseDto
+                .builder()
+                .id(buffet.getId())
+                .nome(buffet.getNome())
+                .email(buffet.getEmail())
+                .descricao(buffet.getDescricao())
+                .imagem(buffet.getImagem())
+                .urlSite(buffet.getUrlSite())
+                .telefone(buffet.getTelefone())
+                .plano(buffet.getPlano())
                 .build();
 
         DecoracaoResponseDto decoracaoResponseDto = DecoracaoResponseDto.builder()
                 .id(decoracao.getId())
                 .nome(decoracao.getNome())
                 .foto(decoracao.getFoto())
-                .tipoEvento(dto)
+                .tipoEvento(tipoEventoDto)
+                .buffet(buffetDto)
                 .build();
+
         return decoracaoResponseDto;
     }
 }

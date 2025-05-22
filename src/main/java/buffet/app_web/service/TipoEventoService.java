@@ -1,5 +1,6 @@
 package buffet.app_web.service;
 
+import buffet.app_web.entities.Buffet;
 import buffet.app_web.entities.TipoEvento;
 import buffet.app_web.repositories.TipoEventoRepository;
 import buffet.app_web.strategies.TipoEventoStrategy;
@@ -15,17 +16,22 @@ import java.util.Optional;
 public class TipoEventoService implements TipoEventoStrategy {
     @Autowired
     private TipoEventoRepository tipoEventoRepository;
+    @Autowired
+    private BuffetService buffetService;
 
     @Override
-    public List<TipoEvento> listarTodos(){
-        return tipoEventoRepository.findAll();
+    public List<TipoEvento> listarTodos(Long buffetId){
+        return tipoEventoRepository.findAllByBuffetId(buffetId);
     }
     @Override
     public TipoEvento buscarPorId(Integer id){
         return tipoEventoRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
     @Override
-    public TipoEvento salvar(TipoEvento tipoEvento){
+    public TipoEvento salvar(TipoEvento tipoEvento, Long buffetId){
+        Buffet buffet = buffetService.buscarPorId(buffetId);
+
+        tipoEvento.setBuffet(buffet);
         return tipoEventoRepository.save(tipoEvento);
     }
     @Override

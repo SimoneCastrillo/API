@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DecoracaoStrategy {
-    List<Decoracao> listarTodos();
+    List<Decoracao> listarTodos(Long buffetId);
     Decoracao buscarPorId(int id);
-    Decoracao salvar(Decoracao decoracao, Integer tipoEventoId);
+    Decoracao salvar(Decoracao decoracao, Integer tipoEventoId, Long buffetId);
     void deletar(int id);
     List<Decoracao> listarPorTipoDeEvento(Integer tipoEventoId);
 
